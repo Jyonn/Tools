@@ -1,0 +1,3 @@
+pypinyin
+django
+SmartDjango>=2.0.6b1
