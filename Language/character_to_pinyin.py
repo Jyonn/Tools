@@ -16,5 +16,5 @@ class CharacterToPinyin(BaseHandler):
     @Analyse.r(q=QUERY)
     def run(r):
         text = r.d.text
-        pinyin = pypinyin.pinyin(text)
+        pinyin = pypinyin.pinyin(text, errors=lambda _: [None])
         return list(map(lambda x: x[0], pinyin))
