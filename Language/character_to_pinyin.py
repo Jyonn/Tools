@@ -9,11 +9,11 @@ class CharacterToPinyin(BaseHandler):
     APP_NAME = '汉字转拼音'
     APP_DESC = '支持多音字判别，拼音自带音调'
 
-    QUERY = [Param('text', '汉字').validate(PL.str_len(500))]
+    BODY = [Param('text', '汉字').validate(PL.str_len(500))]
 
     @staticmethod
     @Packing.http_pack
-    @Analyse.r(q=QUERY)
+    @Analyse.r(b=BODY)
     def run(r):
         text = r.d.text
         pinyin = pypinyin.pinyin(text, errors=lambda _: [None])
