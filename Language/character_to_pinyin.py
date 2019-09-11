@@ -1,5 +1,5 @@
 import pypinyin
-from SmartDjango import Packing, Param, Analyse
+from SmartDjango import Excp, Param, Analyse
 
 from Base.handler import BaseHandler
 from Base.param_limit import PL
@@ -12,7 +12,7 @@ class CharacterToPinyin(BaseHandler):
     BODY = [Param('text', '汉字').validate(PL.str_len(500))]
 
     @staticmethod
-    @Packing.http_pack
+    @Excp.handle
     @Analyse.r(b=BODY)
     def run(r):
         text = r.d.text

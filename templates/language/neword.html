@@ -1,0 +1,31 @@
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>牛窝 - 潮词一网打尽</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/architecture.css">
+    <script src="js/store.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/request.js"></script>
+    <script src="js/neword.js"></script>
+</head>
+<body>
+<input class="input-box" id="input-box" placeholder="在此填写潮词…">
+<div class="title-box" id="title-box"></div>
+<div class="pinyin-box" id="pinyin-box"></div>
+<div class="content-box">
+    <div class="title" id="content-title"></div>
+    <div class="desc" id="content-desc" contenteditable="true" placeholder="在此填写潮词解释"></div>
+</div>
+</body>
+<script>
+    new Neword({
+        inputBox: 'input-box',
+        titleBox: 'title-box',
+        pinyinBox: 'pinyin-box',
+        contentTitle: 'content-title',
+        contentDesc: 'content-desc',
+    });
+</script>
+</html>

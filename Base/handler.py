@@ -1,4 +1,4 @@
-from SmartDjango import Packing, Param
+from SmartDjango import Excp, Param
 
 
 class BaseHandler:
@@ -13,22 +13,12 @@ class BaseHandler:
 
     @classmethod
     def readable_param(cls, param: Param):
-        _d = dict(
+        d_ = dict(
             name=param.name,
-            desc=param.verbose_name,
-            allow_null=param.allow_null,
+            desc=param.read_name,
+            allow_null=param.null,
             has_default=param.has_default(),
         )
         if param.has_default():
-            _d['default_value'] = param.default_value
-        return _d
-
-    @staticmethod
-    @Packing.http_pack
-    def get(r):
-        return dict(
-            app_name=cls.APP_NAME,
-            app_desc=cls.APP_DESC,
-            body_params=list(map(cls.readable_param, cls.BODY)),
-            query_params=list(map(cls.readable_param, cls.QUERY)),
-        )
+            d_['default_value'] = param.default
+        return d_

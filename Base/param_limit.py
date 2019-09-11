@@ -1,10 +1,10 @@
-from SmartDjango import BaseError, Packing
+from SmartDjango import BaseError, Excp
 
 
 class ParamLimit:
     @staticmethod
     def str_len(max_len, min_len=0):
-        @Packing.pack
+        @Excp.pack
         def decorator(string):
             if not isinstance(string, str):
                 return BaseError.FIELD_FORMAT
