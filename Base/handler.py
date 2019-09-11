@@ -1,4 +1,4 @@
-from SmartDjango import Excp, Param
+from SmartDjango import Param
 
 
 class BaseHandler:
