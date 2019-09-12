@@ -4,8 +4,11 @@ from SmartDjango import Param
 class BaseHandler:
     APP_NAME = "应用名称"
     APP_DESC = "应用介绍"
+
     BODY = []
-    QUERY = []
+    # QUERY = []
+    REQUEST_EXAMPLE = None
+    RESPONSE_EXAMPLE = None
 
     @staticmethod
     def run():

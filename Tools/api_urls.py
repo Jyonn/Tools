@@ -1,6 +1,6 @@
 from django.urls import re_path
 
-from Language.views import languageRouter
+from App.Language.views import languageRouter
 
 
 urlpatterns = [
