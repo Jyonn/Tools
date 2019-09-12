@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Optional
 
 import pypinyin
 from SmartDjango import models, Excp, ErrorCenter, E
@@ -11,7 +11,7 @@ class PhraseError(ErrorCenter):
 PhraseError.register()
 
 
-class Phrase(models.Model):
+class LangPhrPhrase(models.Model):
     cy = models.CharField(
         verbose_name='词语',
         max_length=20,
@@ -31,7 +31,7 @@ class Phrase(models.Model):
         verbose_name='净词语长度',
         help_text='不包含标点符号',
     )
-    
+
     class Meta:
         unique_together = ('cy', 'py')
 
@@ -57,27 +57,27 @@ class Phrase(models.Model):
             py = list(map(lambda x: x[0], py))
         clen = len(cy)
         plen = len(py)
-        
 
-class Tag(models.Model):
+
+class LangPhrTag(models.Model):
     name = models.CharField(
         verbose_name='标签'
     )
 
 
-class TagMap(models.Model):
+class LangPhrTagMap(models.Model):
     phrase = models.ForeignKey(
-        Phrase,
+        LangPhrPhrase,
         verbose_name='关联词语',
         on_delete=models.CASCADE,
     )
-    
+
     tag = models.ForeignKey(
-        Tag,
+        LangPhrTag,
         verbose_name='关联标签',
         on_delete=models.CASCADE,
     )
-    
+
     match = models.NullBooleanField(
         verbose_name='是否匹配',
         help_text='null未知 true匹配 false相反'
@@ -87,46 +87,46 @@ class TagMap(models.Model):
         unique_together = ('phrase', 'tag')
 
 
-class Link(models.Model):
+class LangPhrLink(models.Model):
     linking = models.ForeignKey(
-        Phrase,
+        LangPhrPhrase,
         verbose_name='关联词语',
         on_delete=models.CASCADE,
         related_name='linking',
     )
-    
+
     linked = models.ForeignKey(
-        Phrase,
+        LangPhrPhrase,
         verbose_name='被关联词语',
         on_delete=models.CASCADE,
         related_name='linked',
     )
 
 
-class Group(models.Model):
+class LangPhrGroup(models.Model):
     name = models.CharField(
         verbose_name='组名',
         unique=True,
     )
 
 
-class GroupSet(models.Model):
+class LangPhrGroupSet(models.Model):
     group = models.ForeignKey(
-        Group,
+        LangPhrGroup,
         verbose_name='关联组名',
         on_delete=models.CASCADE,
     )
 
 
-class GroupSetMember(models.Model):
+class LangPhrGroupSetMember(models.Model):
     set = models.ForeignKey(
-        GroupSet,
+        LangPhrGroupSet,
         verbose_name='集合',
         on_delete=models.CASCADE,
     )
 
     phrase = models.ForeignKey(
-        Phrase,
+        LangPhrPhrase,
         verbose_name='关联词语',
         on_delete=models.CASCADE,
     )
