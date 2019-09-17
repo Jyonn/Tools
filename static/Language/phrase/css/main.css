@@ -94,12 +94,6 @@ body {
   width: fit-content;
   margin: 15px;
 }
-.body .phrase-column .phrase-items .phrase-box:hover {
-  background: #555555;
-}
-.body .phrase-column .phrase-items .phrase-box:hover .phrase-box__char-box {
-  color: #eeeeee;
-}
 .body .phrase-column .phrase-items .phrase-box .phrase-box__char-box {
   display: flex;
   flex-direction: column;
