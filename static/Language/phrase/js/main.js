@@ -30,7 +30,7 @@ class PhrasePage {
         this.lastReview = 0;
         this.review.addEventListener('click', () => {
             this.reviewMode = !this.reviewMode;
-            this.refreshReviewMode();
+            this.fetchReviewPhrases();
         });
 
         deactivate(this.rowSelector);
@@ -46,7 +46,7 @@ class PhrasePage {
         this.unchooseAll.addEventListener('click', this.unchooseAllPhrases.bind(this));
         this.toggleAll.addEventListener('click', this.toggleAllPhrases.bind(this));
         this.submit.addEventListener('click', this.submitResult.bind(this));
-        this.nextPage.addEventListener('click', this.refreshReviewMode.bind(this));
+        this.nextPage.addEventListener('click', this.fetchReviewPhrases.bind(this));
         this.resetPage.addEventListener('click', this.resetReviewPage.bind(this));
 
         this.initContributorSelector();
@@ -141,7 +141,7 @@ class PhrasePage {
         this.tagSelectorTitle.innerText = this.tagJar[this.tagId];
         if (this.reviewMode) {
             this.lastReview = 0;
-            this.refreshReviewMode();
+            this.fetchReviewPhrases();
         } else {
             this.fetchPhrases();
         }
@@ -168,10 +168,10 @@ class PhrasePage {
 
     resetReviewPage() {
         this.lastReview = 0;
-        this.refreshReviewMode();
+        this.fetchReviewPhrases();
     }
 
-    refreshReviewMode() {
+    fetchReviewPhrases() {
         if (this.reviewMode) {
             noactivate(this.nextPage);
             noactivate(this.resetPage);
@@ -288,11 +288,20 @@ class PhrasePage {
             }
         });
 
-        Request.put('/dev/api/language/phrase', {tag_id: this.tagId, matched: matched, unmatched: unmatched, contributor: this.contributor})
+        let contributor = '';
+        if (!this.reviewMode) {
+            contributor = this.contributor;
+        }
+
+        Request.put('/dev/api/language/phrase', {tag_id: this.tagId, matched: matched, unmatched: unmatched, contributor: contributor})
             .then(data => {
-                this.fetchPhrases();
-                this.contributeWage += 1;
-                this.refreshWage();
+                if (this.reviewMode) {
+                    this.fetchReviewPhrases();
+                } else {
+                    this.fetchPhrases();
+                    this.contributeWage += 1;
+                    this.refreshWage();
+                }
             });
     }
 }
