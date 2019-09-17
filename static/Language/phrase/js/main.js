@@ -91,6 +91,8 @@ class PhrasePage {
             <div class="phrase-box ${2}" data-phrase-id=${1} onclick="phrasePage.choosePhrase(this)">
                 <div class="phrase-box__char-box">${0}</div>
             </div>`;
+        const subButton1 = `<div class="sub-btn" onclick="phrasePage.subChooseAllPhrases(this)">全选</div>`;
+        const subButton2 = `<div class="sub-btn" onclick="phrasePage.subToggleAllPhrases(this)">反选</div>`;
 
         let phraseItems = [];
         phrases.forEach(phrase => {
@@ -98,6 +100,8 @@ class PhrasePage {
             phrase.element = html;
             phraseItems.push(html);
         });
+        phraseItems.push(stringToHtml(subButton1));
+        phraseItems.push(stringToHtml(subButton2));
 
         let phraseColumn = stringToHtml(phraseColumnTemplate());
         let phraseItemsElement = phraseColumn.getElementsByClassName('phrase-items')[0];
@@ -165,7 +169,7 @@ class PhrasePage {
     choosePhrase(phraseElement) {
         const phraseId = phraseElement.getAttribute('data-phrase-id');
         toggle(phraseElement);
-        this.phraseJar[phraseId].chosen = true;
+        this.phraseJar[phraseId].chosen = !this.phraseJar[phraseId].chosen;
     }
 
     refreshPhrases() {
@@ -191,6 +195,22 @@ class PhrasePage {
     toggleAllPhrases() {
         this.phrases.forEach(phrase => phrase.chosen = !phrase.chosen);
         this.refreshPhrases();
+    }
+
+    subChooseAllPhrases(element) {
+        let phrases = element.parentNode.getElementsByClassName('phrase-box');
+        phrases = Array.from(phrases);
+        phrases.forEach(phraseElement => {
+            const phraseId = phraseElement.getAttribute('data-phrase-id');
+            activate(phraseElement);
+            this.phraseJar[phraseId].chosen = true;
+        });
+    }
+
+    subToggleAllPhrases(element) {
+        let phrases = element.parentNode.getElementsByClassName('phrase-box');
+        phrases = Array.from(phrases);
+        phrases.forEach(this.choosePhrase.bind(this));
     }
 
     submitResult() {

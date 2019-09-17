@@ -1,5 +1,6 @@
 .shadow,
-.nav .selector {
+.nav .selector,
+.body .phrase-column .sub-btn {
   box-shadow: 0 0 10px gray;
 }
 .strong-shadow {
@@ -79,6 +80,14 @@ body {
 }
 .body .phrase-column {
   display: inline-block;
+}
+.body .phrase-column .sub-btn {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 20px;
+  color: #555555;
+  font-size: 16px;
+  margin-bottom: 15px;
 }
 .body .phrase-column .phrase-items {
   display: flex;
