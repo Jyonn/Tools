@@ -2,6 +2,7 @@ from SmartDjango import Excp, Analyse, Param
 from django.views import View
 
 from Base.param_limit import PL
+from Model.Base.Config.models import Config
 from Model.Language.Phrase.models import Tag, TagMap, Phrase
 from Service.Language.phrase import phraseService
 
@@ -12,6 +13,7 @@ PM_PHRASES = Param('phrases').validate(list).process(
         lambda phrases: list(map(Phrase.get_by_id, phrases)))
 PM_MATCHED = PM_PHRASES.clone().rename('matched')
 PM_UNMATCHED = PM_PHRASES.clone().rename('unmatched')
+PM_CONTRIBUTOR = Param('contributor').process(str)
 
 
 class PhraseView(View):
@@ -30,9 +32,15 @@ class PhraseView(View):
 
     @staticmethod
     @Excp.handle
-    @Analyse.r(b=[PM_TAG_ID, PM_MATCHED, PM_UNMATCHED])
+    @Analyse.r(b=[PM_TAG_ID, PM_MATCHED, PM_UNMATCHED, PM_CONTRIBUTOR])
     def put(r):
         tag = r.d.tag
+        contributor = r.d.contributor
+
+        contributor_key = 'LangPhraseContributor-'+contributor
+        contribute_page = int(Config.get_value_by_key(contributor_key, 0))
+        Config.update_value(contributor_key, str(contribute_page+1))
+
         for phrase in r.d.matched:
             TagMap.new_or_put(phrase, tag, match=True)
         for phrase in r.d.unmatched:
@@ -68,3 +76,14 @@ class TagView(View):
         tag = r.d.tag
         tag.remove()
 
+
+class ContributorView(View):
+    @staticmethod
+    @Excp.handle
+    @Analyse.r(b=[PM_CONTRIBUTOR])
+    def post(r):
+        contributor = r.d.contributor
+        contributor_key = 'LangPhraseContributor-' + contributor
+        contribute_page = int(Config.get_value_by_key(contributor_key, 0))
+
+        return contribute_page

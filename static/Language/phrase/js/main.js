@@ -1,5 +1,8 @@
 class PhrasePage {
     constructor() {
+        this.contributorSelectorTitle = getById('contributor-selector-title');
+        this.contributorItems = getById('contributor-selector-items');
+
         this.tagSelectorTitle = getById('tag-selector-title');
         this.tagItems = getById('tag-selector-items');
 
@@ -14,6 +17,8 @@ class PhrasePage {
 
         this.body = getByClass('body');
 
+        this.wage = getById('wage');
+
         deactivate(this.rowSelector);
         deactivate(this.chooseAll);
         deactivate(this.unchooseAll);
@@ -25,8 +30,18 @@ class PhrasePage {
         this.toggleAll.addEventListener('click', this.toggleAllPhrases.bind(this));
         this.submit.addEventListener('click', this.submitResult.bind(this));
 
+        this.initContributorSelector();
         this.initTagSelector();
         this.initRowSelector();
+    }
+
+    initContributorSelector() {
+        this.contributor = '';
+        this.contributeWage = 0;
+        deactivate(this.contributorItems);
+        this.contributorSelectorTitle.addEventListener('click', () => {
+            toggle(this.contributorItems);
+        })
     }
 
     initTagSelector() {
@@ -131,6 +146,22 @@ class PhrasePage {
         this.showPhraseMatrix();
     }
 
+    setContributor(contributorElement) {
+        deactivate(this.contributorItems);
+        this.contributorSelectorTitle.innerText = contributorElement.innerText;
+        this.contributor = contributorElement.innerText;
+
+        Request.post('/dev/api/language/phrase/contributor', {contributor: this.contributor})
+            .then(page => {
+                this.contributeWage = page;
+                this.refreshWage();
+            })
+    }
+
+    refreshWage() {
+        this.wage.innerText = `实时工资：${this.contributeWage / 10}元`;
+    }
+
     choosePhrase(phraseElement) {
         const phraseId = phraseElement.getAttribute('data-phrase-id');
         toggle(phraseElement);
@@ -173,9 +204,11 @@ class PhrasePage {
             }
         });
 
-        Request.put('/dev/api/language/phrase', {tag_id: this.tagId, matched: matched, unmatched: unmatched})
+        Request.put('/dev/api/language/phrase', {tag_id: this.tagId, matched: matched, unmatched: unmatched, contributor: this.contributor})
             .then(data => {
                 this.fetchPhrases();
+                this.contributeWage += 1;
+                this.refreshWage();
             });
     }
 }

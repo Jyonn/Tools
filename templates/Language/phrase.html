@@ -10,6 +10,13 @@
 </head>
 <body>
     <div class="nav">
+        <div class="selector ptr">
+            <div class="selector__title" id="contributor-selector-title">标注者</div>
+            <div class="selector__items" id="contributor-selector-items">
+                <div class="selector__items__item" onclick="phrasePage.setContributor(this)">刘奇煚</div>
+                <div class="selector__items__item" onclick="phrasePage.setContributor(this)">邱浏静</div>
+            </div>
+        </div>
         <div class="selector ptr" id="tag-selector">
             <div class="selector__title" id="tag-selector-title">选择属性</div>
             <div class="selector__items" id="tag-selector-items"></div>
@@ -32,6 +39,7 @@
         </div>
     </div>
     <div class="body"></div>
+    <div class="wage" id="wage"></div>
 </body>
 <script src="{% static 'Base/js/common.js' %}"></script>
 <script src="{% static 'Base/js/store.js' %}"></script>
