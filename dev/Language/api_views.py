@@ -1,4 +1,5 @@
 from SmartDjango import Excp, Analyse, Param
+from SmartDjango.models import Pager
 from django.views import View
 
 from Base.param_limit import PL
@@ -87,3 +88,20 @@ class ContributorView(View):
         contribute_page = int(Config.get_value_by_key(contributor_key, 0))
 
         return contribute_page
+
+
+class ReviewView(View):
+    @staticmethod
+    @Excp.handle
+    @Analyse.r(q=[
+        PM_TAG_ID,
+        Param('count').process(int).process(PL.number(100, 1)),
+        Param('last').process(int)
+    ])
+    def get(r):
+        tag = r.d.tag
+        last = r.d.last
+        count = r.d.count
+
+        objects = TagMap.objects.search(tag=tag)
+        return Pager().page(objects, last, count).dict(TagMap.d)

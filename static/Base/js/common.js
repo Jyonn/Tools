@@ -29,6 +29,11 @@ function deactivate(ele) {
     ele.classList.remove(active);
 }
 
+function noactivate(ele) {
+    ele.classList.remove(active);
+    ele.classList.remove(inactive);
+}
+
 function toggle(ele) {
     if (ele.classList.contains('active')) {
         deactivate(ele);

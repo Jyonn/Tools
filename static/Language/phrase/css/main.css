@@ -3,7 +3,8 @@
 .body .phrase-column .sub-btn {
   box-shadow: 0 0 10px gray;
 }
-.strong-shadow {
+.strong-shadow,
+.nav .selector.active {
   box-shadow: 0 0 15px gray;
 }
 body {
@@ -22,10 +23,34 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+}
+.nav .left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: flex-start;
+}
+.nav .left .selector {
+  margin-left: 20px;
+}
+.nav .right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+.nav .right .selector {
+  margin-right: 20px;
 }
 .nav .selector.inactive {
   display: none;
+}
+.nav .selector.active {
+  background: #F78A8A;
+}
+.nav .selector.active .selector__title {
+  color: white;
 }
 .nav .selector.right {
   position: absolute;
@@ -36,7 +61,6 @@ body {
   color: black;
   display: flex;
   align-items: center;
-  margin-left: 20px;
   flex-direction: column;
   white-space: nowrap;
 }

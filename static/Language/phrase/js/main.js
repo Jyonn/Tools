@@ -1,5 +1,6 @@
 class PhrasePage {
     constructor() {
+        this.contributorSelector = getById('contributor-selector');
         this.contributorSelectorTitle = getById('contributor-selector-title');
         this.contributorItems = getById('contributor-selector-items');
 
@@ -13,22 +14,40 @@ class PhrasePage {
         this.chooseAll = getById('choose-all');
         this.unchooseAll = getById('unchoose-all');
         this.toggleAll = getById('toggle-all');
+
+        this.review = getById('review');
+        this.reviewTitle = getById('review-title');
+
+        this.nextPage = getById('next-page');
+        this.resetPage = getById('reset-page');
         this.submit = getById('submit');
 
         this.body = getByClass('body');
 
         this.wage = getById('wage');
 
+        this.reviewMode = false;
+        this.lastReview = 0;
+        this.review.addEventListener('click', () => {
+            this.reviewMode = !this.reviewMode;
+            this.refreshReviewMode();
+        });
+
         deactivate(this.rowSelector);
         deactivate(this.chooseAll);
         deactivate(this.unchooseAll);
         deactivate(this.toggleAll);
         deactivate(this.submit);
+        deactivate(this.submit);
+        deactivate(this.nextPage);
+        deactivate(this.resetPage);
 
         this.chooseAll.addEventListener('click', this.chooseAllPhrases.bind(this));
         this.unchooseAll.addEventListener('click', this.unchooseAllPhrases.bind(this));
         this.toggleAll.addEventListener('click', this.toggleAllPhrases.bind(this));
         this.submit.addEventListener('click', this.submitResult.bind(this));
+        this.nextPage.addEventListener('click', this.refreshReviewMode.bind(this));
+        this.resetPage.addEventListener('click', this.resetReviewPage.bind(this));
 
         this.initContributorSelector();
         this.initTagSelector();
@@ -120,7 +139,17 @@ class PhrasePage {
         this.tagId = Number.parseInt(tagElement.getAttribute('data-tag-id'));
         deactivate(this.tagItems);
         this.tagSelectorTitle.innerText = this.tagJar[this.tagId];
-        this.fetchPhrases();
+        if (this.reviewMode) {
+            this.lastReview = 0;
+            this.refreshReviewMode();
+        } else {
+            this.fetchPhrases();
+        }
+        noactivate(this.rowSelector);
+        noactivate(this.chooseAll);
+        noactivate(this.unchooseAll);
+        noactivate(this.toggleAll);
+        noactivate(this.submit);
     }
 
     fetchPhrases() {
@@ -134,13 +163,47 @@ class PhrasePage {
                     this.phraseJar[phrase.id] = phraseDict;
                 });
                 this.showPhraseMatrix();
-
-                activate(this.rowSelector);
-                activate(this.chooseAll);
-                activate(this.unchooseAll);
-                activate(this.toggleAll);
-                activate(this.submit);
             });
+    }
+
+    resetReviewPage() {
+        this.lastReview = 0;
+        this.refreshReviewMode();
+    }
+
+    refreshReviewMode() {
+        if (this.reviewMode) {
+            noactivate(this.nextPage);
+            noactivate(this.resetPage);
+            activate(this.review);
+            this.reviewTitle.innerText = '退出审核';
+            if (this.tagId) {
+                Request.get('/dev/api/language/phrase/review', {tag_id: this.tagId, count: 100, last: this.lastReview})
+                    .then(body => {
+                        this.phrases = [];
+                        this.phraseJar = {};
+                        body.object_list.forEach(tagMap => {
+                            const phraseDict = {cy: tagMap.phrase.cy, chosen: tagMap.match, id: tagMap.phrase.id};
+                            this.phrases.push(phraseDict);
+                            this.phraseJar[tagMap.phrase.id] = phraseDict;
+                        });
+                        this.lastReview = body.next_value;
+                        if (this.lastReview === null) {
+                            deactivate(this.nextPage);
+                        }
+                        this.showPhraseMatrix();
+                    });
+            }
+        } else {
+            deactivate(this.nextPage);
+            deactivate(this.resetPage);
+            noactivate(this.review);
+            this.reviewTitle.innerText = '审核';
+            this.lastReview = 0;
+            if (this.tagId) {
+                this.fetchPhrases();
+            }
+        }
     }
 
     setRow(row) {
@@ -152,6 +215,7 @@ class PhrasePage {
 
     setContributor(contributorElement) {
         deactivate(this.contributorItems);
+        activate(this.contributorSelector);
         this.contributorSelectorTitle.innerText = contributorElement.innerText;
         this.contributor = contributorElement.innerText;
 

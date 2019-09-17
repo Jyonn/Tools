@@ -236,6 +236,12 @@ class TagMap(models.Model):
                 return ret
         return tagmap
 
+    def _readable_phrase(self):
+        return self.phrase.d()
+
+    def d(self):
+        return self.dictor(['phrase', 'match'])
+
 
 class Link(models.Model):
     linking = models.ForeignKey(
