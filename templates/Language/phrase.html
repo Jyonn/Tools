@@ -1,0 +1,43 @@
+{% load staticfiles %}
+
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>冰山押韵 - 规整家</title>
+    <link rel="stylesheet" href="{% static 'Base/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'Language/phrase/css/main.css' %}">
+</head>
+<body>
+    <div class="nav">
+        <div class="selector smooth ptr" id="tag-selector">
+            <div class="selector__title" id="tag-selector-title">选择属性</div>
+            <div class="selector__items" id="tag-selector-items"></div>
+        </div>
+        <div class="selector smooth ptr" id="row-selector">
+            <div class="selector__title" id="row-selector-title">选择行数</div>
+            <div class="selector__items" id="row-selector-items"></div>
+        </div>
+        <div class="selector smooth ptr" id="choose-all">
+            <div class="selector__title">全选</div>
+        </div>
+        <div class="selector smooth ptr" id="unchoose-all">
+            <div class="selector__title">全不选</div>
+        </div>
+        <div class="selector smooth ptr" id="toggle-all">
+            <div class="selector__title">反选</div>
+        </div>
+        <div class="selector smooth ptr right" id="submit">
+            <div class="selector__title">提交</div>
+        </div>
+    </div>
+    <div class="body"></div>
+</body>
+<script src="{% static 'Base/js/common.js' %}"></script>
+<script src="{% static 'Base/js/store.js' %}"></script>
+<script src="{% static 'Base/js/request.js' %}"></script>
+<script src="{% static 'Language/phrase/js/main.js' %}"></script>
+<script>
+    window.onbeforeunload = function() { return "Your work will be lost."; };
+    const phrasePage = new PhrasePage();
+</script>

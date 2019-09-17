@@ -1,0 +1,153 @@
+@c-main: #F78A8A;
+@c-text: #555555;
+@c-strong-text: black;
+@c-border: #eeeeee;
+
+.shadow {
+  box-shadow: 0 0 10px gray;
+}
+
+.strong-shadow {
+  box-shadow: 0 0 15px gray;
+}
+
+body {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 0;
+  height: 100%;
+  font-size: 0;
+}
+
+@nav-height: 70px;
+
+.nav {
+  z-index: 1;
+  position: fixed;
+  height: @nav-height;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+
+  .selector.inactive {
+    display: none;
+  }
+
+  .selector.right {
+    position: absolute;
+    right: 20px;
+  }
+
+  @selector-height: 30px;
+  .selector {
+    height: @selector-height;
+    color: black;
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+    flex-direction: column;
+    white-space: nowrap;
+    &:extend(.shadow);
+
+    &:hover {
+      background: @c-main;
+
+      .selector__title {
+        color: white;
+      }
+      &:extend(.strong-shadow);
+    }
+
+    .selector__title {
+      height: @selector-height;
+      line-height: @selector-height;
+      padding: 0 20px;
+      color: @c-text;
+      font-size: 16px;
+    }
+
+    .selector__items {
+      width: 100%;
+      border: 1px solid @c-border;
+      border-top: none;
+      background: white;
+
+      .selector__items__item {
+        height: @selector-height;
+        line-height: @selector-height;
+        text-align: center;
+        color: @c-text;
+        font-size: 14px;
+
+        &:hover {
+          color: @c-strong-text;
+          font-size: 16px;
+        }
+      }
+    }
+
+    .selector__items.inactive {
+      display: none;
+    }
+
+    .selector__items.active {
+      display: unset;
+    }
+  }
+}
+
+@footer-height: 50px;
+
+.body {
+  position: absolute;
+  width: fit-content;
+  height: calc(~'100% - @{nav-height} - @{footer-height}');
+  top: @nav-height;
+  overflow: scroll;
+  white-space: nowrap;
+
+  .phrase-column {
+    display: inline-block;
+
+    .phrase-items {
+      display: flex;
+      flex-direction: column;
+      width: fit-content;
+      align-items: center;
+      justify-content: center;
+
+      .phrase-box {
+        &:hover {
+          background: @c-text;
+
+          .phrase-box__char-box {
+            color: @c-border;
+          }
+        }
+        padding: 5px;
+        display: flex;
+        border: 1px solid @c-border;
+        width: fit-content;
+        margin: 15px;
+
+        .phrase-box__char-box {
+          display: flex;
+          flex-direction: column;
+          margin-right: 2px;
+          font-size: 20px;
+        }
+      }
+    }
+
+    .phrase-box.active {
+      background: @c-strong-text;
+
+      .phrase-box__char-box {
+          color: white;
+      }
+    }
+  }
+}

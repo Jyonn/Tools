@@ -1,0 +1,36 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "lucida grande", "lucida sans unicode", lucida, helvetica, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+}
+a {
+  text-decoration: none;
+}
+input,
+textarea,
+div {
+  outline: none;
+  border: none;
+  background: none;
+  resize: none;
+}
+div[contenteditable]:empty:before {
+  content: attr(placeholder);
+}
+div[contenteditable]:focus {
+  content: none;
+}
+.img-fit {
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  display: inherit;
+}
+.smooth {
+  transition: 0.5s;
+}
+.ptr {
+  cursor: pointer;
+}
+/*# sourceMappingURL=base.css.map */

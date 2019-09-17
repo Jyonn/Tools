@@ -1,0 +1,122 @@
+.shadow,
+.nav .selector {
+  box-shadow: 0 0 10px gray;
+}
+.strong-shadow,
+.nav .selector:hover {
+  box-shadow: 0 0 15px gray;
+}
+body {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 0;
+  height: 100%;
+  font-size: 0;
+}
+.nav {
+  z-index: 1;
+  position: fixed;
+  height: 70px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+.nav .selector.inactive {
+  display: none;
+}
+.nav .selector.right {
+  position: absolute;
+  right: 20px;
+}
+.nav .selector {
+  height: 30px;
+  color: black;
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+  flex-direction: column;
+  white-space: nowrap;
+}
+.nav .selector:hover {
+  background: #F78A8A;
+}
+.nav .selector:hover .selector__title {
+  color: white;
+}
+.nav .selector .selector__title {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 20px;
+  color: #555555;
+  font-size: 16px;
+}
+.nav .selector .selector__items {
+  width: 100%;
+  border: 1px solid #eeeeee;
+  border-top: none;
+  background: white;
+}
+.nav .selector .selector__items .selector__items__item {
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  color: #555555;
+  font-size: 14px;
+}
+.nav .selector .selector__items .selector__items__item:hover {
+  color: black;
+  font-size: 16px;
+}
+.nav .selector .selector__items.inactive {
+  display: none;
+}
+.nav .selector .selector__items.active {
+  display: unset;
+}
+.body {
+  position: absolute;
+  width: fit-content;
+  height: calc(100% - 70px - 50px);
+  top: 70px;
+  overflow: scroll;
+  white-space: nowrap;
+}
+.body .phrase-column {
+  display: inline-block;
+}
+.body .phrase-column .phrase-items {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+}
+.body .phrase-column .phrase-items .phrase-box {
+  padding: 5px;
+  display: flex;
+  border: 1px solid #eeeeee;
+  width: fit-content;
+  margin: 15px;
+}
+.body .phrase-column .phrase-items .phrase-box:hover {
+  background: #555555;
+}
+.body .phrase-column .phrase-items .phrase-box:hover .phrase-box__char-box {
+  color: #eeeeee;
+}
+.body .phrase-column .phrase-items .phrase-box .phrase-box__char-box {
+  display: flex;
+  flex-direction: column;
+  margin-right: 2px;
+  font-size: 20px;
+}
+.body .phrase-column .phrase-box.active {
+  background: black;
+}
+.body .phrase-column .phrase-box.active .phrase-box__char-box {
+  color: white;
+}
+/*# sourceMappingURL=main.css.map */

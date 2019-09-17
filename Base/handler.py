@@ -1,4 +1,11 @@
-from SmartDjango import Param
+from SmartDjango import Param, Excp, ErrorCenter, E
+
+
+class HandlerError(ErrorCenter):
+    HANDLER_NOT_IMPLEMENTED = E("未实现的功能")
+
+
+HandlerError.register()
 
 
 class BaseHandler:
@@ -10,18 +17,31 @@ class BaseHandler:
     REQUEST_EXAMPLE = None
     RESPONSE_EXAMPLE = None
 
+    SUB_ROUTER = None
+
     @staticmethod
-    def run():
-        pass
+    @Excp.handle
+    def run(r):
+        return HandlerError.HANDLER_NOT_IMPLEMENTED
 
     @classmethod
     def readable_param(cls, param: Param):
+        if isinstance(param, str):
+            param = Param(param)
         d_ = dict(
             name=param.name,
             desc=param.read_name,
             allow_null=param.null,
             has_default=param.has_default(),
+            is_dict=param.dict,
+            is_list=param.list,
+            children=list(map(cls.readable_param, param.children))
         )
         if param.has_default():
             d_['default_value'] = param.default
         return d_
+
+    def rename(self, app_name=None, app_desc=None):
+        self.APP_DESC = app_desc or self.APP_DESC
+        self.APP_NAME = app_name or self.APP_NAME
+        return self
