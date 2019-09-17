@@ -2,8 +2,7 @@
 .nav .selector {
   box-shadow: 0 0 10px gray;
 }
-.strong-shadow,
-.nav .selector:hover {
+.strong-shadow {
   box-shadow: 0 0 15px gray;
 }
 body {
@@ -39,12 +38,6 @@ body {
   margin-left: 20px;
   flex-direction: column;
   white-space: nowrap;
-}
-.nav .selector:hover {
-  background: #F78A8A;
-}
-.nav .selector:hover .selector__title {
-  color: white;
 }
 .nav .selector .selector__title {
   height: 30px;

@@ -30,7 +30,7 @@ class PhrasePage {
     }
 
     initTagSelector() {
-        const tagItemTemplate = template`<div class="selector__items__item smooth" data-tag-id=${1} onclick="phrasePage.setTag(this)">${0}</div>`;
+        const tagItemTemplate = template`<div class="selector__items__item" data-tag-id=${1} onclick="phrasePage.setTag(this)">${0}</div>`;
 
         // this.tagSelector = getById('tag-selector');
         this.tagItems.innerHTML = '';
@@ -51,7 +51,7 @@ class PhrasePage {
     }
 
     initRowSelector() {
-        const rowItemTemplate = template`<div class="selector__items__item smooth" onclick="phrasePage.setRow(${1})">${0}</div>`;
+        const rowItemTemplate = template`<div class="selector__items__item" onclick="phrasePage.setRow(${1})">${0}</div>`;
         this.rows = 5;
 
         this.rowItems.innerHTML = '';
@@ -73,7 +73,7 @@ class PhrasePage {
                 <div class="phrase-items"></div>
             </div>`;
         const phraseBoxTemplate = template`
-            <div class="phrase-box smooth ${2}" data-phrase-id=${1} onclick="phrasePage.choosePhrase(this)">
+            <div class="phrase-box ${2}" data-phrase-id=${1} onclick="phrasePage.choosePhrase(this)">
                 <div class="phrase-box__char-box">${0}</div>
             </div>`;
 
