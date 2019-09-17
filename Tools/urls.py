@@ -21,7 +21,7 @@ urlpatterns = [
     path('v1/', include('Tools.api_urls'))
 ]
 
-if platform.system() == 'Darwin':
-    urlpatterns += [
-        path('dev/', include('Tools.dev_urls'))
-    ]
+# if platform.system() == 'Darwin':
+urlpatterns += [
+    path('dev/', include('Tools.dev_urls'))
+]
