@@ -225,7 +225,7 @@ class PhrasePage {
     }
 
     refreshWage() {
-        this.wage.innerText = `标注工资：${this.contributeWage.tag}元，添词工资：${this.contributeWage.add}元`;
+        this.wage.innerText = `标注工资：${this.contributeWage.tag.toFixed(1)}元，添词工资：${this.contributeWage.add.toFixed(2)}元`;
     }
 
     choosePhrase(phraseElement) {
@@ -311,6 +311,7 @@ class PhrasePage {
                         this.showPhraseMatrix();
                     }
                     this.contributeWage.add += 0.02;
+                    // this.contributeWage
                     this.refreshWage();
                 }).catch(ErrorHandler.handler);
         }
