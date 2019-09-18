@@ -69,10 +69,10 @@ class Request {
                 if (!this._handler || this._handler(resp)) {
                     alert(resp.msg);
                 }
-                return ErrorHandler.handler(resp);
+                return Promise.reject(resp);
             }
             return resp.body;
-        }).catch(ErrorHandler.handler);
+        });
     }
     static async get(url, data=null, credential=true, json=true) {
         return this.baseFetch(Method.GET, url, data, credential, json);

@@ -33,6 +33,19 @@ class PhraseView(View):
 
     @staticmethod
     @Excp.handle
+    @Analyse.r(b=['phrase', PM_CONTRIBUTOR])
+    def post(r):
+        phrase = r.d.phrase
+        phrase = Phrase.new(phrase)
+
+        contributor = r.d.contributor
+        add_key = 'LangPhraseAdd-' + contributor
+        add_count = int(Config.get_value_by_key(add_key, 0))
+        Config.update_value(add_key, str(add_count + 1))
+        return phrase.d()
+
+    @staticmethod
+    @Excp.handle
     @Analyse.r(b=[PM_TAG_ID, PM_MATCHED, PM_UNMATCHED, PM_CONTRIBUTOR])
     def put(r):
         tag = r.d.tag
@@ -67,7 +80,6 @@ class TagView(View):
     def put(r):
         tag = r.d.tag
         name = r.d.name
-        # tag.
         tag.put(name)
 
     @staticmethod
@@ -86,8 +98,10 @@ class ContributorView(View):
         contributor = r.d.contributor
         contributor_key = 'LangPhraseContributor-' + contributor
         contribute_page = int(Config.get_value_by_key(contributor_key, 0))
+        add_key = 'LangPhraseAdd-' + contributor
+        add_count = int(Config.get_value_by_key(add_key, 0))
 
-        return contribute_page
+        return dict(contribute_page=contribute_page, add_count=add_count)
 
 
 class ReviewView(View):

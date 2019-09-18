@@ -89,11 +89,11 @@ class Phrase(models.Model):
 
     @classmethod
     @Excp.pack
-    def _new(cls, cy, py, clen, plen):
+    def _new(cls, cy, py, clen, plen, number_py):
         cls.validator(locals())
 
         try:
-            phrase = cls(cy=cy, py=py, clen=clen, plen=plen,)
+            phrase = cls(cy=cy, py=py, clen=clen, plen=plen, number_py=number_py)
             phrase.save()
         except Exception:
             return PhraseError.CREATE_PHRASE(cy)
@@ -107,8 +107,15 @@ class Phrase(models.Model):
             py = list(map(lambda x: x[0], py))
         clen = len(cy)
         plen = len(py)
+
+        number_py = []
+        for py_ in py:
+            from Service.Language.phrase import phraseService
+            number_py.append(phraseService.format_syllable(py_, printer='number_toner'))
+        number_py = json.dumps(number_py, ensure_ascii=False)
+
         py = json.dumps(py, ensure_ascii=False)
-        return cls._new(cy, py, clen, plen)
+        return cls._new(cy, py, clen, plen, number_py)
 
     def _readable_id(self):
         return self.pk

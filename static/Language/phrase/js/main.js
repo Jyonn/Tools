@@ -12,11 +12,11 @@ class PhrasePage {
         this.rowItems = getById('row-selector-items');
 
         this.chooseAll = getById('choose-all');
-        this.unchooseAll = getById('unchoose-all');
         this.toggleAll = getById('toggle-all');
 
         this.review = getById('review');
         this.reviewTitle = getById('review-title');
+        this.addPhrase = getById('add-phrase');
 
         this.nextPage = getById('next-page');
         this.resetPage = getById('reset-page');
@@ -35,7 +35,6 @@ class PhrasePage {
 
         deactivate(this.rowSelector);
         deactivate(this.chooseAll);
-        deactivate(this.unchooseAll);
         deactivate(this.toggleAll);
         deactivate(this.submit);
         deactivate(this.submit);
@@ -43,11 +42,11 @@ class PhrasePage {
         deactivate(this.resetPage);
 
         this.chooseAll.addEventListener('click', this.chooseAllPhrases.bind(this));
-        this.unchooseAll.addEventListener('click', this.unchooseAllPhrases.bind(this));
         this.toggleAll.addEventListener('click', this.toggleAllPhrases.bind(this));
         this.submit.addEventListener('click', this.submitResult.bind(this));
         this.nextPage.addEventListener('click', this.fetchReviewPhrases.bind(this));
         this.resetPage.addEventListener('click', this.resetReviewPage.bind(this));
+        this.addPhrase.addEventListener('keydown', this.submitPhrase.bind(this));
 
         this.initContributorSelector();
         this.initTagSelector();
@@ -56,7 +55,7 @@ class PhrasePage {
 
     initContributorSelector() {
         this.contributor = '';
-        this.contributeWage = 0;
+        this.contributeWage = {tag: 0, add: 0};
         deactivate(this.contributorItems);
         this.contributorSelectorTitle.addEventListener('click', () => {
             toggle(this.contributorItems);
@@ -147,7 +146,6 @@ class PhrasePage {
         }
         noactivate(this.rowSelector);
         noactivate(this.chooseAll);
-        noactivate(this.unchooseAll);
         noactivate(this.toggleAll);
         noactivate(this.submit);
     }
@@ -163,7 +161,7 @@ class PhrasePage {
                     this.phraseJar[phrase.id] = phraseDict;
                 });
                 this.showPhraseMatrix();
-            });
+            }).catch(ErrorHandler.handler);
     }
 
     resetReviewPage() {
@@ -192,7 +190,7 @@ class PhrasePage {
                             deactivate(this.nextPage);
                         }
                         this.showPhraseMatrix();
-                    });
+                    }).catch(ErrorHandler.handler);
             }
         } else {
             deactivate(this.nextPage);
@@ -220,14 +218,14 @@ class PhrasePage {
         this.contributor = contributorElement.innerText;
 
         Request.post('/dev/api/language/phrase/contributor', {contributor: this.contributor})
-            .then(page => {
-                this.contributeWage = page;
+            .then(data => {
+                this.contributeWage = {tag: data.contribute_page / 10, add: data.add_count / 50};
                 this.refreshWage();
-            })
+            }).catch(ErrorHandler.handler);
     }
 
     refreshWage() {
-        this.wage.innerText = `实时工资：${this.contributeWage / 10}元`;
+        this.wage.innerText = `标注工资：${this.contributeWage.tag}元，添词工资：${this.contributeWage.add}元`;
     }
 
     choosePhrase(phraseElement) {
@@ -248,11 +246,6 @@ class PhrasePage {
 
     chooseAllPhrases() {
         this.phrases.forEach(phrase => phrase.chosen = true);
-        this.refreshPhrases();
-    }
-
-    unchooseAllPhrases() {
-        this.phrases.forEach(phrase => phrase.chosen = false);
         this.refreshPhrases();
     }
 
@@ -299,9 +292,27 @@ class PhrasePage {
                     this.fetchReviewPhrases();
                 } else {
                     this.fetchPhrases();
-                    this.contributeWage += 1;
+                    this.contributeWage.tag += 0.1;
                     this.refreshWage();
                 }
-            });
+            }).catch(ErrorHandler.handler);
+    }
+
+    submitPhrase(event) {
+        if (event.keyCode === 13) {
+            let phrase = this.addPhrase.value;
+            this.addPhrase.value = '';
+            Request.post('/dev/api/language/phrase', {phrase: phrase, contributor: this.contributor})
+                .then(data => {
+                    const phraseDict = {cy: data.cy, chosen: false, id: data.id};
+                    if (this.tagId) {
+                        this.phrases.push(phraseDict);
+                        this.phraseJar[data.id] = phraseDict;
+                        this.showPhraseMatrix();
+                    }
+                    this.contributeWage.add += 0.02;
+                    this.refreshWage();
+                }).catch(ErrorHandler.handler);
+        }
     }
 }
