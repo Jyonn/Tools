@@ -20,10 +20,15 @@ body {
   font-size: 0;
 }
 
-@nav-height: 70px;
+@nav-height: 50px;
+
+.nav.second {
+  top: @nav-height;
+  z-index: 1;
+}
 
 .nav {
-  z-index: 1;
+  z-index: 2;
   position: fixed;
   height: @nav-height;
   width: 100%;
@@ -51,6 +56,12 @@ body {
     .selector {
       margin-right: 20px;
     }
+    .title-select {
+      margin-right: 20px;
+      .selector {
+        margin-right: 0;
+      }
+    }
   }
 
   .selector.inactive {
@@ -66,9 +77,20 @@ body {
       &:extend(.strong-shadow);
   }
 
-  .selector.right {
-    position: absolute;
-    right: 20px;
+  .title-select {
+    display: flex;
+    flex-direction: row;
+    height: @selector-height;
+    color: black;
+    white-space: nowrap;
+    &:extend(.shadow);
+
+    .selector {
+      box-shadow: none;
+      .selector__title {
+        //padding-right: 0;
+      }
+    }
   }
 
   @selector-height: 30px;
@@ -80,15 +102,6 @@ body {
     flex-direction: column;
     white-space: nowrap;
     &:extend(.shadow);
-    //
-    //&:hover {
-    //  background: @c-main;
-    //
-    //  .selector__title {
-    //    color: white;
-    //  }
-    //  &:extend(.strong-shadow);
-    //}
 
     .selector__title {
       height: @selector-height;
@@ -128,13 +141,11 @@ body {
   }
 }
 
-@footer-height: 50px;
-
 .body {
   position: absolute;
   width: fit-content;
-  height: calc(~'100% - @{nav-height} - @{footer-height}');
-  top: @nav-height;
+  height: calc(~'100% - 2 * @{nav-height} - 50px');
+  top: 2 * @nav-height;
   overflow: scroll;
   white-space: nowrap;
 
@@ -148,7 +159,7 @@ body {
       color: @c-text;
       font-size: 16px;
       &:extend(.shadow);
-      margin-bottom: 15px;
+      margin: 10px;
     }
 
     .phrase-items {
@@ -170,7 +181,7 @@ body {
         display: flex;
         border: 1px solid @c-border;
         width: fit-content;
-        margin: 15px;
+        margin: 12px;
 
         .phrase-box__char-box {
           display: flex;

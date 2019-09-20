@@ -22,21 +22,8 @@
                 <div class="selector__title" id="tag-selector-title">选择属性</div>
                 <div class="selector__items" id="tag-selector-items"></div>
             </div>
-            <div class="selector ptr" id="row-selector">
-                <div class="selector__title" id="row-selector-title">选择行数</div>
-                <div class="selector__items" id="row-selector-items"></div>
-            </div>
-            <div class="selector ptr" id="choose-all">
-                <div class="selector__title">全选</div>
-            </div>
-            <div class="selector ptr" id="toggle-all">
-                <div class="selector__title">反选</div>
-            </div>
             <div class="selector ptr" id="review">
                 <div class="selector__title" id="review-title">审核</div>
-            </div>
-            <div class="selector ptr">
-                <input class="selector__title" id="add-phrase" placeholder="输入词语，按回车添加"/>
             </div>
         </div>
         <div class="right">
@@ -48,6 +35,32 @@
             </div>
             <div class="selector ptr" id="submit">
                 <div class="selector__title">提交</div>
+            </div>
+        </div>
+    </div>
+    <div class="nav second">
+        <div class="left">
+            <div class="selector ptr" id="row-selector">
+                <div class="selector__title" id="row-selector-title">选择行数</div>
+                <div class="selector__items" id="row-selector-items"></div>
+            </div>
+            <div class="selector ptr" id="choose-all">
+                <div class="selector__title">全选</div>
+            </div>
+            <div class="selector ptr" id="toggle-all">
+                <div class="selector__title">反选</div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="title-select">
+                <div class="selector ptr">
+                    <div class="selector__title" id="input-mode-title">添加</div>
+                    <div class="selector__items" id="input-mode-items">
+                        <div class="selector__items__item" onclick="phrasePage.setInputMode(0)">添加</div>
+                        <div class="selector__items__item" onclick="phrasePage.setInputMode(1)">搜索</div>
+                    </div>
+                </div>
+                <input id="input-phrase" placeholder="输入词语，按回车"/>
             </div>
         </div>
     </div>

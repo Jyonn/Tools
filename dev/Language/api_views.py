@@ -1,4 +1,4 @@
-from SmartDjango import Excp, Analyse, Param
+from SmartDjango import Excp, Analyse, Param, BaseError
 from SmartDjango.models import Pager
 from django.views import View
 
@@ -14,7 +14,8 @@ PM_PHRASES = Param('phrases').validate(list).process(
         lambda phrases: list(map(Phrase.get_by_id, phrases)))
 PM_MATCHED = PM_PHRASES.clone().rename('matched')
 PM_UNMATCHED = PM_PHRASES.clone().rename('unmatched')
-PM_CONTRIBUTOR = Param('contributor').process(str)
+PM_CONTRIBUTOR = Param('contributor').process(str).set_default('')
+PM_ACTION = Param('action').process(str).set_default('add')
 
 
 class PhraseView(View):
@@ -33,16 +34,25 @@ class PhraseView(View):
 
     @staticmethod
     @Excp.handle
-    @Analyse.r(b=['phrase', PM_CONTRIBUTOR])
+    @Analyse.r(b=['cy', PM_CONTRIBUTOR, PM_ACTION, PM_TAG_ID.clone().set_null()])
     def post(r):
-        phrase = r.d.phrase
-        phrase = Phrase.new(phrase)
+        cy = r.d.cy
+        action = r.d.action
 
-        contributor = r.d.contributor
-        add_key = 'LangPhraseAdd-' + contributor
-        add_count = int(Config.get_value_by_key(add_key, 0))
-        Config.update_value(add_key, str(add_count + 1))
-        return phrase.d()
+        if action == 'add':
+            cy = Phrase.new(cy)
+            contributor = r.d.contributor
+            add_key = 'LangPhraseAdd-' + contributor
+            add_count = int(Config.get_value_by_key(add_key, 0))
+            Config.update_value(add_key, str(add_count + 1))
+            return cy.d()
+        else:
+            if not r.d.tag:
+                return BaseError.MISS_PARAM(('tag_id', '标签'))
+            tag = r.d.tag
+            cy = Phrase.get(cy)
+            tagmap = TagMap.get(cy, tag)
+            return tagmap.d()
 
     @staticmethod
     @Excp.handle

@@ -11,12 +11,15 @@ class PhrasePage {
         this.rowSelectorTitle = getById('row-selector-title');
         this.rowItems = getById('row-selector-items');
 
+        this.inputModeTitle = getById('input-mode-title');
+        this.inputModeItems = getById('input-mode-items');
+
         this.chooseAll = getById('choose-all');
         this.toggleAll = getById('toggle-all');
 
         this.review = getById('review');
         this.reviewTitle = getById('review-title');
-        this.addPhrase = getById('add-phrase');
+        this.inputPhrase = getById('input-phrase');
 
         this.nextPage = getById('next-page');
         this.resetPage = getById('reset-page');
@@ -46,11 +49,20 @@ class PhrasePage {
         this.submit.addEventListener('click', this.submitResult.bind(this));
         this.nextPage.addEventListener('click', this.fetchReviewPhrases.bind(this));
         this.resetPage.addEventListener('click', this.resetReviewPage.bind(this));
-        this.addPhrase.addEventListener('keydown', this.submitPhrase.bind(this));
+        this.inputPhrase.addEventListener('keydown', this.submitPhrase.bind(this));
 
         this.initContributorSelector();
         this.initTagSelector();
         this.initRowSelector();
+        this.initInputModeSelector();
+    }
+
+    initInputModeSelector() {
+        this.inputMode = 0;  // add
+        deactivate(this.inputModeItems);
+        this.inputModeTitle.addEventListener('click', () => {
+            toggle(this.inputModeItems);
+        });
     }
 
     initContributorSelector() {
@@ -300,20 +312,46 @@ class PhrasePage {
 
     submitPhrase(event) {
         if (event.keyCode === 13) {
-            let phrase = this.addPhrase.value;
-            this.addPhrase.value = '';
-            Request.post('/dev/api/language/phrase', {phrase: phrase, contributor: this.contributor})
-                .then(data => {
+            if (!this.tagId) {
+                alert('选择属性后才能搜索');
+                return;
+            }
+
+            let cy = this.inputPhrase.value;
+            this.inputPhrase.value = '';
+
+            if (this.inputMode === 0) {
+                Request.post('/dev/api/language/phrase', {
+                    cy: cy,
+                    contributor: this.contributor,
+                    action: 'add',
+                }).then(data => {
                     const phraseDict = {cy: data.cy, chosen: false, id: data.id};
-                    if (this.tagId) {
-                        this.phrases.push(phraseDict);
-                        this.phraseJar[data.id] = phraseDict;
-                        this.showPhraseMatrix();
-                    }
+                    this.phrases.push(phraseDict);
+                    this.phraseJar[data.id] = phraseDict;
+                    this.showPhraseMatrix();
                     this.contributeWage.add += 0.02;
                     // this.contributeWage
                     this.refreshWage();
                 }).catch(ErrorHandler.handler);
+            } else {
+                Request.post('/dev/api/language/phrase', {
+                    cy: cy,
+                    tag_id: this.tagId,
+                    action: 'search',
+                }).then(data => {
+                    const phraseDict = {cy: data.phrase.cy, chosen: data.match, id: data.phrase.id};
+                    this.phrases.push(phraseDict);
+                    this.phraseJar[data.id] = phraseDict;
+                    this.showPhraseMatrix();
+                }).catch(ErrorHandler.handler);
+            }
         }
+    }
+
+    setInputMode(inputMode) {
+        this.inputMode = inputMode;
+        this.inputModeTitle.innerText = ['添加', '搜索'][this.inputMode];
+        deactivate(this.inputModeItems);
     }
 }

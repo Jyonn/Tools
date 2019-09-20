@@ -78,6 +78,36 @@ class Phrase(models.Model):
     def __str__(self):
         return self.cy + ' ' + ' '.join(json.loads(self.py))
 
+    @staticmethod
+    def get_number_py(py: List):
+        number_py = []
+        for py_ in py:
+            from Service.Language.phrase import phraseService
+            number_py.append(phraseService.format_syllable(py_, printer='number_toner'))
+        number_py = json.dumps(number_py, ensure_ascii=False)
+        return number_py
+
+    @classmethod
+    @Excp.pack
+    def _get(cls, cy, number_py):
+        cls.validator(locals())
+
+        try:
+            return cls.objects.get(cy=cy, number_py=number_py)
+        except cls.DoesNotExist:
+            return PhraseError.PHRASE_NOT_FOUND
+        except Exception:
+            return PhraseError.GET_PHRASE
+
+    @classmethod
+    @Excp.pack
+    def get(cls, cy, py: Optional[list] = None):
+        if py is None:
+            py = pypinyin.pinyin(cy, errors='ignore', style=pypinyin.Style.TONE)
+            py = list(map(lambda x: x[0], py))
+        number_py = cls.get_number_py(py)
+        return cls._get(cy, number_py)
+
     @classmethod
     def get_by_id(cls, id_):
         try:
@@ -108,11 +138,7 @@ class Phrase(models.Model):
         clen = len(cy)
         plen = len(py)
 
-        number_py = []
-        for py_ in py:
-            from Service.Language.phrase import phraseService
-            number_py.append(phraseService.format_syllable(py_, printer='number_toner'))
-        number_py = json.dumps(number_py, ensure_ascii=False)
+        number_py = cls.get_number_py(py)
 
         py = json.dumps(py, ensure_ascii=False)
         return cls._new(cy, py, clen, plen, number_py)

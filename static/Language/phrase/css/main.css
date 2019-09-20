@@ -1,4 +1,5 @@
 .shadow,
+.nav .title-select,
 .nav .selector,
 .body .phrase-column .sub-btn {
   box-shadow: 0 0 10px gray;
@@ -15,10 +16,14 @@ body {
   height: 100%;
   font-size: 0;
 }
-.nav {
+.nav.second {
+  top: 50px;
   z-index: 1;
+}
+.nav {
+  z-index: 2;
   position: fixed;
-  height: 70px;
+  height: 50px;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -43,6 +48,12 @@ body {
 .nav .right .selector {
   margin-right: 20px;
 }
+.nav .right .title-select {
+  margin-right: 20px;
+}
+.nav .right .title-select .selector {
+  margin-right: 0;
+}
 .nav .selector.inactive {
   display: none;
 }
@@ -52,9 +63,15 @@ body {
 .nav .selector.active .selector__title {
   color: white;
 }
-.nav .selector.right {
-  position: absolute;
-  right: 20px;
+.nav .title-select {
+  display: flex;
+  flex-direction: row;
+  height: 30px;
+  color: black;
+  white-space: nowrap;
+}
+.nav .title-select .selector {
+  box-shadow: none;
 }
 .nav .selector {
   height: 30px;
@@ -97,8 +114,8 @@ body {
 .body {
   position: absolute;
   width: fit-content;
-  height: calc(100% - 70px - 50px);
-  top: 70px;
+  height: calc(100% - 2 * 50px - 50px);
+  top: 100px;
   overflow: scroll;
   white-space: nowrap;
 }
@@ -111,7 +128,7 @@ body {
   padding: 0 20px;
   color: #555555;
   font-size: 16px;
-  margin-bottom: 15px;
+  margin: 10px;
 }
 .body .phrase-column .phrase-items {
   display: flex;
@@ -125,7 +142,7 @@ body {
   display: flex;
   border: 1px solid #eeeeee;
   width: fit-content;
-  margin: 15px;
+  margin: 12px;
 }
 .body .phrase-column .phrase-items .phrase-box .phrase-box__char-box {
   display: flex;
