@@ -1,4 +1,6 @@
-from SmartDjango import Excp, Analyse, Param, BaseError
+import json
+
+from SmartDjango import Excp, Analyse, Param, BaseError, P, ErrorCenter, E
 from SmartDjango.models import Pager
 from django.views import View
 
@@ -14,8 +16,27 @@ PM_PHRASES = Param('phrases').validate(list).process(
         lambda phrases: list(map(Phrase.get_by_id, phrases)))
 PM_MATCHED = PM_PHRASES.clone().rename('matched')
 PM_UNMATCHED = PM_PHRASES.clone().rename('unmatched')
-PM_CONTRIBUTOR = Param('contributor').process(str).set_default('')
+# PM_CONTRIBUTOR = Param('contributor').process(str).set_default('')
 PM_ACTION = Param('action').process(str).set_default('add')
+
+
+class DevLangPhraseError(ErrorCenter):
+    CONTRIBUTOR_NOT_FOUND = E("贡献者不存在")
+
+
+DevLangPhraseError.register()
+
+
+@Excp.pack
+def get_contributor(entrance):
+    entrance_key = 'LangPhraseEntrance'
+    entrances = json.loads(Config.get_value_by_key(entrance_key))
+    if entrance in entrances:
+        return entrances[entrance]
+    return DevLangPhraseError.CONTRIBUTOR_NOT_FOUND
+
+
+PM_ENTRANCE = P('entrance').process(P.Processor(get_contributor, yield_name='contributor'))
 
 
 class PhraseView(View):
@@ -32,7 +53,7 @@ class PhraseView(View):
         return phrases.dict(Phrase.d)
 
     @staticmethod
-    @Analyse.r(b=['cy', PM_CONTRIBUTOR, PM_ACTION, PM_TAG_ID.clone().set_null()])
+    @Analyse.r(b=['cy', PM_ENTRANCE, PM_ACTION, PM_TAG_ID.clone().set_null()])
     def post(r):
         cy = r.d.cy
         action = r.d.action
@@ -53,7 +74,7 @@ class PhraseView(View):
             return tagmap.d()
 
     @staticmethod
-    @Analyse.r(b=[PM_TAG_ID, PM_MATCHED, PM_UNMATCHED, PM_CONTRIBUTOR])
+    @Analyse.r(b=[PM_TAG_ID, PM_MATCHED, PM_UNMATCHED, PM_ENTRANCE])
     def put(r):
         tag = r.d.tag
         contributor = r.d.contributor
@@ -95,8 +116,7 @@ class TagView(View):
 
 class ContributorView(View):
     @staticmethod
-    @Excp.handle
-    @Analyse.r(b=[PM_CONTRIBUTOR])
+    @Analyse.r(b=[PM_ENTRANCE])
     def post(r):
         contributor = r.d.contributor
         contributor_key = 'LangPhraseContributor-' + contributor
@@ -104,7 +124,7 @@ class ContributorView(View):
         add_key = 'LangPhraseAdd-' + contributor
         add_count = int(Config.get_value_by_key(add_key, 0))
 
-        return dict(contribute_page=contribute_page, add_count=add_count)
+        return dict(contribute_page=contribute_page, add_count=add_count, contributor=contributor)
 
 
 class ReviewView(View):

@@ -1,4 +1,4 @@
-from App.Network.ip import IPLookup
+from App.Network.ip_lookup import IPLookup
 from Base.router import Router
 
 networkRouter = Router()

@@ -1,9 +1,13 @@
 class PhrasePage {
     constructor() {
-        this.contributorSelector = getById('contributor-selector');
-        this.contributorSelectorTitle = getById('contributor-selector-title');
-        this.contributorItems = getById('contributor-selector-items');
+        this.entrance = getById('entrance');
+        this.enter = getById('enter');
+        this.loginMask = getById('login-mask');
 
+        this.loadEntrance();
+        this.enter.addEventListener('click', this.checkEntrance.bind(this));
+
+        this.contributorSelectorTitle = getById('contributor-selector-title');
         this.tagSelectorTitle = getById('tag-selector-title');
         this.tagItems = getById('tag-selector-items');
 
@@ -68,10 +72,6 @@ class PhrasePage {
     initContributorSelector() {
         this.contributor = '';
         this.contributeWage = {tag: 0, add: 0};
-        deactivate(this.contributorItems);
-        this.contributorSelectorTitle.addEventListener('click', () => {
-            toggle(this.contributorItems);
-        })
     }
 
     initTagSelector() {
@@ -223,19 +223,6 @@ class PhrasePage {
         this.showPhraseMatrix();
     }
 
-    setContributor(contributorElement) {
-        deactivate(this.contributorItems);
-        activate(this.contributorSelector);
-        this.contributorSelectorTitle.innerText = contributorElement.innerText;
-        this.contributor = contributorElement.innerText;
-
-        Request.post('/dev/api/language/phrase/contributor', {contributor: this.contributor})
-            .then(data => {
-                this.contributeWage = {tag: data.contribute_page / 10, add: data.add_count / 50};
-                this.refreshWage();
-            }).catch(ErrorHandler.handler);
-    }
-
     refreshWage() {
         this.wage.innerText = `标注工资：${this.contributeWage.tag.toFixed(1)}元，添词工资：${this.contributeWage.add.toFixed(2)}元`;
     }
@@ -353,5 +340,25 @@ class PhrasePage {
         this.inputMode = inputMode;
         this.inputModeTitle.innerText = ['添加', '搜索'][this.inputMode];
         deactivate(this.inputModeItems);
+    }
+
+    restoreEntrance() {
+        Store.save('entrance', this.entranceId);
+    }
+
+    loadEntrance() {
+        this.entrance.value = Store.load('entrance');
+    }
+
+    checkEntrance() {
+        this.entranceId = this.entrance.value;
+        Request.post('/dev/api/language/phrase/contributor', {entrance: this.entranceId})
+            .then(data => {
+                this.restoreEntrance();
+                this.contributeWage = {tag: data.contribute_page / 10, add: data.add_count / 50};
+                this.contributorSelectorTitle.innerText = data.contributor;
+                this.refreshWage();
+                deactivate(this.loginMask);
+            }).catch(ErrorHandler.handler);
     }
 }

@@ -9,14 +9,16 @@
     <link rel="stylesheet" href="{% static 'Language/phrase/css/main.css' %}">
 </head>
 <body>
+    <div class="absolute full login-mask" id="login-mask">
+        <div class="flex full full-container">
+            <input class="element" id="entrance" placeholder="输入贡献者ID">
+            <div class="element btn" id="enter">进入后台</div>
+        </div>
+    </div>
     <div class="nav">
         <div class="left">
             <div class="selector ptr" id="contributor-selector">
                 <div class="selector__title" id="contributor-selector-title">标注者</div>
-                <div class="selector__items" id="contributor-selector-items">
-                    <div class="selector__items__item" onclick="phrasePage.setContributor(this)">刘奇煚</div>
-                    <div class="selector__items__item" onclick="phrasePage.setContributor(this)">邱浏静</div>
-                </div>
             </div>
             <div class="selector ptr" id="tag-selector">
                 <div class="selector__title" id="tag-selector-title">选择属性</div>
