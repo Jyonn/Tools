@@ -1,5 +1,5 @@
 from SmartDjango import Excp, ErrorCenter, E
-from django.http import HttpRequest, HttpResponseRedirect
+from django.http import HttpRequest
 
 from Base.handler import BaseHandler
 
@@ -26,12 +26,14 @@ class Router:
     def register(self, path: str, handler):
         self.handlers[path] = handler
 
+    def register_param(self, path: str, handler):
+        self.handlers['param:' + path] = handler
+
+    def register_usage(self, path: str, handler):
+        self.handlers['usage:' + path] = handler
+
     @classmethod
     def get(cls, handler: BaseHandler):
-        # sub_router = None
-        # if isinstance(handler.SUB_ROUTER, Router):
-        #     sub_router = handler.SUB_ROUTER
-        #     sub_router = list(map(sub_router.get_base, sub_router.handlers))
         return dict(
             method='POST',
             content_type='application/json',

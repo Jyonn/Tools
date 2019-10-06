@@ -1,4 +1,4 @@
-from SmartDjango import Param, Excp, ErrorCenter, E
+from SmartDjango import P, ErrorCenter, E
 
 
 class HandlerError(ErrorCenter):
@@ -20,14 +20,13 @@ class BaseHandler:
     SUB_ROUTER = None
 
     @staticmethod
-    @Excp.handle
     def run(r):
         return HandlerError.HANDLER_NOT_IMPLEMENTED
 
     @classmethod
-    def readable_param(cls, param: Param):
+    def readable_param(cls, param: P):
         if isinstance(param, str):
-            param = Param(param)
+            param = P(param)
         d_ = dict(
             name=param.name,
             desc=param.read_name,

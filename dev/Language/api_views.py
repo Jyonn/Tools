@@ -20,7 +20,6 @@ PM_ACTION = Param('action').process(str).set_default('add')
 
 class PhraseView(View):
     @staticmethod
-    @Excp.handle
     @Analyse.r(q=[PM_TAG_ID, Param('count').process(int).process(PL.number(100, 1))])
     def get(r):
         tag = r.d.tag
@@ -33,7 +32,6 @@ class PhraseView(View):
         return phrases.dict(Phrase.d)
 
     @staticmethod
-    @Excp.handle
     @Analyse.r(b=['cy', PM_CONTRIBUTOR, PM_ACTION, PM_TAG_ID.clone().set_null()])
     def post(r):
         cy = r.d.cy
@@ -55,7 +53,6 @@ class PhraseView(View):
             return tagmap.d()
 
     @staticmethod
-    @Excp.handle
     @Analyse.r(b=[PM_TAG_ID, PM_MATCHED, PM_UNMATCHED, PM_CONTRIBUTOR])
     def put(r):
         tag = r.d.tag
@@ -73,19 +70,16 @@ class PhraseView(View):
 
 class TagView(View):
     @staticmethod
-    @Excp.handle
     def get(r):
         return Tag.objects.dict(Tag.d)
 
     @staticmethod
-    @Excp.handle
     @Analyse.r(b=[PM_TAG_NAME])
     def post(r):
         name = r.d.name
         Tag.new(name)
 
     @staticmethod
-    @Excp.handle
     @Analyse.r(b=[PM_TAG_NAME], q=[PM_TAG_ID])
     def put(r):
         tag = r.d.tag
@@ -93,7 +87,6 @@ class TagView(View):
         tag.put(name)
 
     @staticmethod
-    @Excp.handle
     @Analyse.r(q=[PM_TAG_ID])
     def delete(r):
         tag = r.d.tag
@@ -116,7 +109,6 @@ class ContributorView(View):
 
 class ReviewView(View):
     @staticmethod
-    @Excp.handle
     @Analyse.r(q=[
         PM_TAG_ID,
         Param('count').process(int).process(PL.number(100, 1)),

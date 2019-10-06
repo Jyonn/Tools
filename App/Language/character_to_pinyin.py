@@ -1,5 +1,5 @@
 import pypinyin
-from SmartDjango import Excp, Param, Analyse
+from SmartDjango import P, Analyse
 
 from Base.handler import BaseHandler
 from Base.param_limit import PL
@@ -10,14 +10,13 @@ class CharacterToPinyin(BaseHandler):
     APP_DESC = '支持多音字判别，拼音自带音调'
 
     BODY = [
-        Param('text', '汉字').validate(PL.str_len(500)),
-        Param('heteronym_when_single', '单个汉字返回多音字').process(bool),
+        P('text', '汉字').validate(PL.str_len(500)),
+        P('heteronym_when_single', '单个汉字返回多音字').process(bool),
     ]
     REQUEST_EXAMPLE = {'text': '林俊杰'}
     RESPONSE_EXAMPLE = ["lín", "jùn", "jié"]
 
     @staticmethod
-    @Excp.handle
     @Analyse.r(b=BODY)
     def run(r):
         text = r.d.text

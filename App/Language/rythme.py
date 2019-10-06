@@ -1,4 +1,4 @@
-from SmartDjango import Excp, Analyse, Param
+from SmartDjango import Analyse, Param
 
 from Base.handler import BaseHandler
 from Base.param_limit import PL
@@ -9,7 +9,9 @@ from Service.Language.phrase import phraseService, Syllables, SyllableClusters
 class Rythme(BaseHandler):
     class RythmeCluster(BaseHandler):
         APP_NAME = '押韵拼音组'
-        APP_DESC = 'syllables分为22个组，每组的音节视为互可押韵。\n' \
+        APP_DESC = 'cluster和cluster_type的取值说明。\n' \
+                   '通过POST请求获取音节(syllable)数据。\n' \
+                   'syllables分为22个组，每组的音节视为互可押韵。\n' \
                    'cluster_type参数可以是strict, normal, custom。\n' \
                    '当其为strict时，此22组相互独立。组内相互押韵，组间不为押韵；\n' \
                    '当其为normal时，以下组间相互押韵：%s；\n' \
@@ -17,7 +19,6 @@ class Rythme(BaseHandler):
                    ', '.join(map(str, SyllableClusters['normal']))
 
         @staticmethod
-        @Excp.handle
         def run(r):
             return dict(syllables=Syllables)
 
@@ -36,10 +37,9 @@ class Rythme(BaseHandler):
     ]
 
     SUB_ROUTER = Router()
-    SUB_ROUTER.register('cluster', RythmeCluster)
+    SUB_ROUTER.register_param('cluster', RythmeCluster)
 
     @staticmethod
-    @Excp.handle
     @Analyse.r(b=BODY)
     def run(r):
         py = r.d.py

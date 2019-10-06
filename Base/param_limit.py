@@ -31,5 +31,22 @@ class ParamLimit:
             return value
         return decorator
 
+    @staticmethod
+    @Excp.pack
+    def ip_dot2int(ip: str):
+        ip_seg = ip.split('.')
+        if len(ip_seg) != 4:
+            return BaseError.FIELD_FORMAT('IP地址格式错误')
+        ip_seg = list(map(int, ip_seg))
+        ip_number = 0
+
+        for seg in ip_seg:
+            if seg < 0 or seg > 255:
+                return BaseError.FIELD_FORMAT('IP地址格式错误')
+            ip_number <<= 8
+            ip_number += seg
+
+        return ip_number
+
 
 PL = ParamLimit
