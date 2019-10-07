@@ -20,7 +20,7 @@ class PhrasePage {
 
         this.chooseAll = getById('choose-all');
         this.toggleAll = getById('toggle-all');
-        this.chooseAllNot4 = get('choose-all-not-4');
+        this.chooseAllNot4 = getById('choose-all-not-4');
 
         this.review = getById('review');
         this.reviewTitle = getById('review-title');
@@ -42,6 +42,7 @@ class PhrasePage {
         });
 
         deactivate(this.rowSelector);
+        deactivate(this.chooseAllNot4);
         deactivate(this.chooseAll);
         deactivate(this.toggleAll);
         deactivate(this.submit);
@@ -160,6 +161,7 @@ class PhrasePage {
         }
         noactivate(this.rowSelector);
         noactivate(this.chooseAll);
+        noactivate(this.chooseAllNot4);
         noactivate(this.toggleAll);
         noactivate(this.submit);
     }
