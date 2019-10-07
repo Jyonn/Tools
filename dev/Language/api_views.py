@@ -79,7 +79,7 @@ class PhraseView(View):
         tag = r.d.tag
         contributor = r.d.contributor
 
-        contributor_key = 'LangPhraseContributor-'+contributor
+        contributor_key = 'LangPhraseContributor-' + contributor
         contribute_page = int(Config.get_value_by_key(contributor_key, 0))
         Config.update_value(contributor_key, str(contribute_page+1))
 

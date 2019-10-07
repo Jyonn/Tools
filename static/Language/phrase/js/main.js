@@ -280,12 +280,12 @@ class PhrasePage {
             }
         });
 
-        let contributor = '';
+        let entrance = '';
         if (!this.reviewMode) {
-            contributor = this.contributor;
+            entrance = this.entranceId;
         }
 
-        Request.put('/dev/api/language/phrase', {tag_id: this.tagId, matched: matched, unmatched: unmatched, contributor: contributor})
+        Request.put('/dev/api/language/phrase', {tag_id: this.tagId, matched: matched, unmatched: unmatched, entrance: entrance})
             .then(data => {
                 if (this.reviewMode) {
                     this.fetchReviewPhrases();
@@ -310,7 +310,7 @@ class PhrasePage {
             if (this.inputMode === 0) {
                 Request.post('/dev/api/language/phrase', {
                     cy: cy,
-                    contributor: this.contributor,
+                    entrance: this.entranceId,
                     action: 'add',
                 }).then(data => {
                     const phraseDict = {cy: data.cy, chosen: false, id: data.id};
