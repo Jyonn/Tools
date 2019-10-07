@@ -20,6 +20,7 @@ class PhrasePage {
 
         this.chooseAll = getById('choose-all');
         this.toggleAll = getById('toggle-all');
+        this.chooseAllNot4 = get('choose-all-not-4');
 
         this.review = getById('review');
         this.reviewTitle = getById('review-title');
@@ -48,6 +49,7 @@ class PhrasePage {
         deactivate(this.nextPage);
         deactivate(this.resetPage);
 
+        this.chooseAllNot4.addEventListener('click', this.chooseAllNot4Phrases.bind(this));
         this.chooseAll.addEventListener('click', this.chooseAllPhrases.bind(this));
         this.toggleAll.addEventListener('click', this.toggleAllPhrases.bind(this));
         this.submit.addEventListener('click', this.submitResult.bind(this));
@@ -241,6 +243,11 @@ class PhrasePage {
                 deactivate(phrase.element);
             }
         });
+    }
+
+    chooseAllNot4Phrases() {
+        this.phrases.forEach(phrase => phrase.chosen = phrase.cy.length !== 4);
+        this.refreshPhrases();
     }
 
     chooseAllPhrases() {
