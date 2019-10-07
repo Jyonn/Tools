@@ -334,6 +334,7 @@ class PhrasePage {
                 Request.post('/dev/api/language/phrase', {
                     cy: cy,
                     tag_id: this.tagId,
+                    entrance: this.entranceId,
                     action: 'search',
                 }).then(data => {
                     const phraseDict = {cy: data.phrase.cy, chosen: data.match, id: data.phrase.id};
