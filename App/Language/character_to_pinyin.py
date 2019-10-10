@@ -11,7 +11,7 @@ class CharacterToPinyin(BaseHandler):
 
     BODY = [
         P('text', '汉字').validate(PL.str_len(500)),
-        P('heteronym_when_single', '单个汉字返回多音字').process(bool),
+        P('heteronym_when_single', '单个汉字返回多音字').process(bool).set_default(True),
     ]
     REQUEST_EXAMPLE = {'text': '林俊杰'}
     RESPONSE_EXAMPLE = ["lín", "jùn", "jié"]

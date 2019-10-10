@@ -1,7 +1,7 @@
 from typing import Optional, Union, Callable
 from itertools import chain
 
-from SmartDjango import Excp, ErrorCenter, E
+from SmartDjango import Excp, E, ErrorJar
 
 from Model.Language.Phrase.models import Phrase
 
@@ -90,13 +90,11 @@ ToneJar = {
 ToneList = ['āōēīūǖ', 'áóéíúǘ', 'ǎǒěǐǔǚ', 'àòèìùǜ']
 
 
-class PhraseServiceError(ErrorCenter):
+@ErrorJar.pour
+class PhraseServiceError:
     SYLLABLE_NOT_FOUND = E("找不到音节[{0}]", ph=E.PH_FORMAT)
     SYLLABLE_MULTIPLE_TONE = E("[{0}]音节存在多个声调", ph=E.PH_FORMAT)
     SYLLABLE_FORMAT = E("[{0}]音节格式错误{1}", ph=E.PH_FORMAT)
-
-
-PhraseServiceError.register()
 
 
 class PhraseService:

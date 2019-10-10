@@ -1,11 +1,9 @@
-from SmartDjango import P, ErrorCenter, E
+from SmartDjango import P, E, ErrorJar
 
 
-class HandlerError(ErrorCenter):
+@ErrorJar.pour
+class HandlerError:
     HANDLER_NOT_IMPLEMENTED = E("未实现的功能")
-
-
-HandlerError.register()
 
 
 class BaseHandler:

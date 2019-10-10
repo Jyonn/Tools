@@ -1,15 +1,13 @@
-from SmartDjango import models, ErrorCenter, Excp, E
+from SmartDjango import models, Excp, E, ErrorJar
 
 from Base.operation import O
 
 
-class IPError(ErrorCenter):
+@ErrorJar.pour
+class IPError:
     IP_NOT_FOUND = E("找不到IP[{0}]", ph=E.PH_FORMAT)
     CREATE_IP = E("增加IP[{0}]失败", ph=E.PH_FORMAT)
     GET_IP = E("查找IP[{0}]失败", ph=E.PH_FORMAT)
-
-
-IPError.register()
 
 
 class IP(models.Model):
@@ -78,4 +76,4 @@ class IP(models.Model):
         return O.ip_int2dot(self.ip_end)
 
     def d(self):
-        return self.dictor(['ip_start', 'ip_end', 'country', 'province', 'city', 'owner', 'line'])
+        return self.dictor('ip_start', 'ip_end', 'country', 'province', 'city', 'owner', 'line')

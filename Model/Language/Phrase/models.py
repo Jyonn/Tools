@@ -10,10 +10,11 @@ import json
 from typing import Optional, List
 
 import pypinyin
-from SmartDjango import models, Excp, ErrorCenter, E
+from SmartDjango import models, Excp, ErrorJar, E
 
 
-class PhraseError(ErrorCenter):
+@ErrorJar.pour
+class PhraseError:
     SETMEMBER_CONFLICT = E("组内集合元素[{0}]重复", ph=E.PH_FORMAT)
     GET_GROUPSETMEMBER = E("获取组内集合元素[{0}]失败", ph=E.PH_FORMAT)
     GROUPSETMEMBER_NOT_FOUND = E("找不到组内集合元素[{0}]", ph=E.PH_FORMAT)
@@ -40,9 +41,6 @@ class PhraseError(ErrorCenter):
     PHRASE_NOT_FOUND = E("找不到词语")
     GET_PHRASE = E("获取词语失败")
     CREATE_PHRASE = E("新增词语[{0}]失败", ph=E.PH_FORMAT)
-
-
-PhraseError.register()
 
 
 class Phrase(models.Model):
@@ -150,7 +148,7 @@ class Phrase(models.Model):
         return json.loads(self.py)
 
     def d(self):
-        return self.dictor(['cy', 'py', 'id'])
+        return self.dictor('cy', 'py', 'id')
 
 
 class Tag(models.Model):
@@ -213,7 +211,7 @@ class Tag(models.Model):
         return self.pk
 
     def d(self):
-        return self.dictor(['name', 'start', 'id'])
+        return self.dictor('name', 'start', 'id')
 
 
 class TagMap(models.Model):
@@ -273,7 +271,7 @@ class TagMap(models.Model):
         return self.phrase.d()
 
     def d(self):
-        return self.dictor(['phrase', 'match'])
+        return self.dictor('phrase', 'match')
 
 
 class Link(models.Model):

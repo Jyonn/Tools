@@ -1,6 +1,6 @@
 import json
 
-from SmartDjango import Excp, Analyse, Param, BaseError, P, ErrorCenter, E
+from SmartDjango import Excp, Analyse, Param, BaseError, P, E, ErrorJar
 from SmartDjango.models import Pager
 from django.views import View
 
@@ -11,20 +11,17 @@ from Service.Language.phrase import phraseService
 
 
 PM_TAG_NAME = Tag.get_param('name')
-PM_TAG_ID = Param('tag_id').process(Param.Processor(Tag.get_by_id, yield_name='tag'))
+PM_TAG_ID = Param('tag_id', yield_name='tag').process(Tag.get_by_id)
 PM_PHRASES = Param('phrases').validate(list).process(
         lambda phrases: list(map(Phrase.get_by_id, phrases)))
 PM_MATCHED = PM_PHRASES.clone().rename('matched')
 PM_UNMATCHED = PM_PHRASES.clone().rename('unmatched')
-# PM_CONTRIBUTOR = Param('contributor').process(str).set_default('')
 PM_ACTION = Param('action').process(str).set_default('add')
 
 
-class DevLangPhraseError(ErrorCenter):
+@ErrorJar.pour
+class DevLangPhraseError:
     CONTRIBUTOR_NOT_FOUND = E("贡献者不存在")
-
-
-DevLangPhraseError.register()
 
 
 @Excp.pack
@@ -36,7 +33,7 @@ def get_contributor(entrance):
     return DevLangPhraseError.CONTRIBUTOR_NOT_FOUND
 
 
-PM_ENTRANCE = P('entrance').process(P.Processor(get_contributor, yield_name='contributor'))
+PM_ENTRANCE = P('entrance', yield_name='contributor').process(get_contributor)
 
 
 class PhraseView(View):

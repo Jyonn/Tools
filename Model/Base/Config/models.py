@@ -1,12 +1,10 @@
-from SmartDjango import ErrorCenter, models, Excp, E
+from SmartDjango import ErrorJar, models, Excp, E
 
 
-class ConfigError(ErrorCenter):
+@ErrorJar.pour
+class ConfigError:
     CREATE_CONFIG = E("更新配置错误", hc=500)
     CONFIG_NOT_FOUND = E("不存在的配置", hc=404)
-
-
-ConfigError.register()
 
 
 class Config(models.Model):

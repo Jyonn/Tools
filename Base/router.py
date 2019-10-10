@@ -1,14 +1,12 @@
-from SmartDjango import Excp, ErrorCenter, E
+from SmartDjango import Excp, E, ErrorJar
 from django.http import HttpRequest
 
 from Base.handler import BaseHandler
 
 
-class RouterError(ErrorCenter):
+@ErrorJar.pour
+class RouterError:
     NOT_FOUND_ROUTE = E("不存在的API", hc=404)
-
-
-RouterError.register()
 
 
 class RouteHandler(BaseHandler):
