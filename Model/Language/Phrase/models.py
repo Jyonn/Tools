@@ -30,16 +30,16 @@ class PhraseError:
     LINK_NOT_FOUND = E("找不到[{0}]到[{1}]的链接", ph=E.PH_FORMAT)
 
     CREATE_TAGMAP = E("新增[{0}]对应的[{1}]属性失败", ph=E.PH_FORMAT)
-    GET_TAGMAP = E("获取[{0}]对应的[{1}]属性失败", ph=E.PH_FORMAT)
-    TAGMAP_NOT_FOUND = E("找不到[{0}]对应的[{1}]属性", ph=E.PH_FORMAT)
+    GET_TAGMAP = E("找到词语[{0}]，获取其[{1}]属性失败", ph=E.PH_FORMAT)
+    TAGMAP_NOT_FOUND = E("找到词语[{0}]，但无[{1}]属性", ph=E.PH_FORMAT)
 
     TAG_NAME_CONFLICT = E("属性[{0}]名称重复", ph=E.PH_FORMAT)
     GET_TAG = E("获取属性[{0}]失败", ph=E.PH_FORMAT)
     TAG_NOT_FOUND = E("找不到标签[{0}]", ph=E.PH_FORMAT)
     CREATE_TAG = E("新增属性[{0}]失败", ph=E.PH_FORMAT)
 
-    PHRASE_NOT_FOUND = E("找不到词语")
-    GET_PHRASE = E("获取词语失败")
+    PHRASE_NOT_FOUND = E("找不到词语[{0}]", ph=E.PH_FORMAT)
+    GET_PHRASE = E("获取词语[{0}]失败", ph=E.PH_FORMAT)
     CREATE_PHRASE = E("新增词语[{0}]失败", ph=E.PH_FORMAT)
 
 
@@ -93,9 +93,9 @@ class Phrase(models.Model):
         try:
             return cls.objects.get(cy=cy, number_py=number_py)
         except cls.DoesNotExist:
-            return PhraseError.PHRASE_NOT_FOUND
+            return PhraseError.PHRASE_NOT_FOUND(cy)
         except Exception:
-            return PhraseError.GET_PHRASE
+            return PhraseError.GET_PHRASE(cy)
 
     @classmethod
     @Excp.pack
@@ -111,7 +111,7 @@ class Phrase(models.Model):
         try:
             return cls.objects.get(pk=id_)
         except cls.DoesNotExist:
-            return PhraseError.PHRASE_NOT_FOUND
+            return PhraseError.PHRASE_NOT_FOUND(id_)
         except Exception:
             return PhraseError.GET_PHRASE
 
