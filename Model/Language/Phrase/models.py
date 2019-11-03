@@ -10,37 +10,37 @@ import json
 from typing import Optional, List
 
 import pypinyin
-from SmartDjango import models, Excp, ErrorJar, E
+from SmartDjango import models, E
 
 
-@ErrorJar.pour
+@E.register()
 class PhraseError:
-    SETMEMBER_CONFLICT = E("组内集合元素[{0}]重复", ph=E.PH_FORMAT)
-    GET_GROUPSETMEMBER = E("获取组内集合元素[{0}]失败", ph=E.PH_FORMAT)
-    GROUPSETMEMBER_NOT_FOUND = E("找不到组内集合元素[{0}]", ph=E.PH_FORMAT)
-    CREATE_GROUPSETMEMBER = E("新建组内集合元素[{0}]失败", ph=E.PH_FORMAT)
+    SETMEMBER_CONFLICT = E("组内集合元素[{0}]重复")
+    GET_GROUPSETMEMBER = E("获取组内集合元素[{0}]失败")
+    GROUPSETMEMBER_NOT_FOUND = E("找不到组内集合元素[{0}]")
+    CREATE_GROUPSETMEMBER = E("新建组内集合元素[{0}]失败")
 
-    GROUP_NAME_CONFLICT = E("组别[{0}]名称重复", ph=E.PH_FORMAT)
-    CREATE_GROUP = E("新增组别[{0}]失败", ph=E.PH_FORMAT)
-    GET_GROUP = E("获取组别[{0}]失败", ph=E.PH_FORMAT)
-    GROUP_NOT_FOUND = E("找不到组别[{0}]", ph=E.PH_FORMAT)
+    GROUP_NAME_CONFLICT = E("组别[{0}]名称重复")
+    CREATE_GROUP = E("新增组别[{0}]失败")
+    GET_GROUP = E("获取组别[{0}]失败")
+    GROUP_NOT_FOUND = E("找不到组别[{0}]")
 
-    CREATE_LINK = E("新增[{0}]到[{1}]的链接失败", ph=E.PH_FORMAT)
-    GET_LINK = E("获取[{0}]到[{1}]的链接失败", ph=E.PH_FORMAT)
-    LINK_NOT_FOUND = E("找不到[{0}]到[{1}]的链接", ph=E.PH_FORMAT)
+    CREATE_LINK = E("新增[{0}]到[{1}]的链接失败")
+    GET_LINK = E("获取[{0}]到[{1}]的链接失败")
+    LINK_NOT_FOUND = E("找不到[{0}]到[{1}]的链接")
 
-    CREATE_TAGMAP = E("新增[{0}]对应的[{1}]属性失败", ph=E.PH_FORMAT)
-    GET_TAGMAP = E("找到词语[{0}]，获取其[{1}]属性失败", ph=E.PH_FORMAT)
-    TAGMAP_NOT_FOUND = E("找到词语[{0}]，但无[{1}]属性", ph=E.PH_FORMAT)
+    CREATE_TAGMAP = E("新增[{0}]对应的[{1}]属性失败")
+    GET_TAGMAP = E("找到词语[{0}]，获取其[{1}]属性失败")
+    TAGMAP_NOT_FOUND = E("找到词语[{0}]，但无[{1}]属性")
 
-    TAG_NAME_CONFLICT = E("属性[{0}]名称重复", ph=E.PH_FORMAT)
-    GET_TAG = E("获取属性[{0}]失败", ph=E.PH_FORMAT)
-    TAG_NOT_FOUND = E("找不到标签[{0}]", ph=E.PH_FORMAT)
-    CREATE_TAG = E("新增属性[{0}]失败", ph=E.PH_FORMAT)
+    TAG_NAME_CONFLICT = E("属性[{0}]名称重复")
+    GET_TAG = E("获取属性[{0}]失败")
+    TAG_NOT_FOUND = E("找不到标签[{0}]")
+    CREATE_TAG = E("新增属性[{0}]失败")
 
-    PHRASE_NOT_FOUND = E("找不到词语[{0}]", ph=E.PH_FORMAT)
-    GET_PHRASE = E("获取词语[{0}]失败", ph=E.PH_FORMAT)
-    CREATE_PHRASE = E("新增词语[{0}]失败", ph=E.PH_FORMAT)
+    PHRASE_NOT_FOUND = E("找不到词语[{0}]")
+    GET_PHRASE = E("获取词语[{0}]失败")
+    CREATE_PHRASE = E("新增词语[{0}]失败")
 
 
 class Phrase(models.Model):
@@ -86,19 +86,17 @@ class Phrase(models.Model):
         return number_py
 
     @classmethod
-    @Excp.pack
     def _get(cls, cy, number_py):
         cls.validator(locals())
 
         try:
             return cls.objects.get(cy=cy, number_py=number_py)
         except cls.DoesNotExist:
-            return PhraseError.PHRASE_NOT_FOUND(cy)
-        except Exception:
-            return PhraseError.GET_PHRASE(cy)
+            raise PhraseError.PHRASE_NOT_FOUND(cy)
+        except Exception as err:
+            raise PhraseError.GET_PHRASE(cy, debug_message=err)
 
     @classmethod
-    @Excp.pack
     def get(cls, cy, py: Optional[list] = None):
         if py is None:
             py = pypinyin.pinyin(cy, errors='ignore', style=pypinyin.Style.TONE)
@@ -111,24 +109,22 @@ class Phrase(models.Model):
         try:
             return cls.objects.get(pk=id_)
         except cls.DoesNotExist:
-            return PhraseError.PHRASE_NOT_FOUND(id_)
-        except Exception:
-            return PhraseError.GET_PHRASE
+            raise PhraseError.PHRASE_NOT_FOUND(id_)
+        except Exception as err: 
+            raise PhraseError.GET_PHRASE(id_, debug_message=err)
 
     @classmethod
-    @Excp.pack
     def _new(cls, cy, py, clen, plen, number_py):
         cls.validator(locals())
 
         try:
             phrase = cls(cy=cy, py=py, clen=clen, plen=plen, number_py=number_py)
             phrase.save()
-        except Exception:
-            return PhraseError.CREATE_PHRASE(cy)
+        except Exception as err:
+            raise PhraseError.CREATE_PHRASE(cy, debug_message=err)
         return phrase
 
     @classmethod
-    @Excp.pack
     def new(cls, cy, py: Optional[list] = None):
         if py is None:
             py = pypinyin.pinyin(cy, errors='ignore', style=pypinyin.Style.TONE)
@@ -164,41 +160,38 @@ class Tag(models.Model):
     )
 
     @classmethod
-    @Excp.pack
     def get_by_id(cls, id_):
         try:
             return cls.objects.get(pk=id_)
         except cls.DoesNotExist:
-            return PhraseError.TAG_NOT_FOUND(id_)
-        except Exception:
-            return PhraseError.GET_TAG(id_)
+            raise PhraseError.TAG_NOT_FOUND(id_)
+        except Exception as err:
+            raise PhraseError.GET_TAG(id_, debug_message=err)
 
     @classmethod
-    @Excp.pack
     def get(cls, name):
         try:
             return cls.objects.get(name=name)
         except cls.DoesNotExist:
-            return PhraseError.TAG_NOT_FOUND(name)
-        except Exception:
-            return PhraseError.GET_TAG(name)
+            raise PhraseError.TAG_NOT_FOUND(name)
+        except Exception as err:
+            raise PhraseError.GET_TAG(name, debug_message=err)
 
     @classmethod
-    @Excp.pack
     def new(cls, name):
         try:
             cls.get(name)
-        except Excp as ret:
-            if ret.eis(PhraseError.TAG_NOT_FOUND):
+        except E as e:
+            if e.eis(PhraseError.TAG_NOT_FOUND):
                 try:
                     tag = cls(name=name, start=0)
                     tag.save()
-                except Exception:
-                    return PhraseError.CREATE_TAG(name)
+                except Exception as err:
+                    raise PhraseError.CREATE_TAG(name, debug_message=err)
                 return tag
             else:
-                return ret
-        return PhraseError.TAG_NAME_CONFLICT
+                return e
+        raise PhraseError.TAG_NAME_CONFLICT
 
     def put(self, name):
         self.name = name
@@ -236,24 +229,22 @@ class TagMap(models.Model):
         unique_together = ('phrase', 'tag')
 
     @classmethod
-    @Excp.pack
     def get(cls, phrase: Phrase, tag: Tag):
         try:
             return cls.objects.get(phrase=phrase, tag=tag)
         except cls.DoesNotExist:
-            return PhraseError.TAGMAP_NOT_FOUND((phrase.cy, tag.name))
-        except Exception:
-            return PhraseError.GET_TAGMAP((phrase.cy, tag.name))
+            raise PhraseError.TAGMAP_NOT_FOUND(phrase.cy, tag.name)
+        except Exception as err:
+            raise PhraseError.GET_TAGMAP(phrase.cy, tag.name, debug_message=err)
 
     @classmethod
-    @Excp.pack
     def new_or_put(cls, phrase, tag, match=True):
         try:
             tagmap = cls.get(phrase, tag)
             tagmap.match = match
             tagmap.save()
-        except Excp as ret:
-            if ret.eis(PhraseError.TAGMAP_NOT_FOUND):
+        except E as e:
+            if e.eis(PhraseError.TAGMAP_NOT_FOUND):
                 try:
                     tagmap = cls(
                         phrase=phrase,
@@ -261,10 +252,10 @@ class TagMap(models.Model):
                         match=match,
                     )
                     tagmap.save()
-                except Exception:
-                    return PhraseError.CREATE_TAGMAP((phrase.cy, tag.name))
+                except Exception as err: 
+                    raise PhraseError.CREATE_TAGMAP(phrase.cy, tag.name, debug_message=err)
             else:
-                return ret
+                return e
         return tagmap
 
     def _readable_phrase(self):
@@ -293,21 +284,19 @@ class Link(models.Model):
         unique_together = ('linking', 'linked')
 
     @classmethod
-    @Excp.pack
     def get(cls, linking: Phrase, linked: Phrase):
         try:
             return cls.objects.get(linked=linked, linking=linking)
         except cls.DoesNotExist:
-            return PhraseError.LINK_NOT_FOUND((linking.cy, linked.cy))
-        except Exception:
-            return PhraseError.GET_LINK((linking.cy, linked.cy))
+            raise PhraseError.LINK_NOT_FOUND(linking.cy, linked.cy)
+        except Exception as err: 
+            raise PhraseError.GET_LINK(linking.cy, linked.cy, debug_message=err)
 
     @classmethod
-    @Excp.pack
     def new_or_get(cls, linking: Phrase, linked: Phrase):
         try:
             link = cls.get(linking, linked)
-        except Excp as ret:
+        except E as ret:
             if ret.eis(PhraseError.LINK_NOT_FOUND):
                 try:
                     link = cls(
@@ -315,10 +304,10 @@ class Link(models.Model):
                         linked=linked,
                     )
                     link.save()
-                except Exception:
-                    return PhraseError.CREATE_LINK((linking.cy, linked.cy))
+                except Exception as err: 
+                    raise PhraseError.CREATE_LINK(linking.cy, linked.cy, debug_message=err)
             else:
-                return ret
+                raise ret
         return link
 
 
@@ -330,32 +319,29 @@ class Group(models.Model):
     )
 
     @classmethod
-    @Excp.pack
     def get(cls, name):
         try:
             return cls.objects.get(name=name)
         except cls.DoesNotExist:
-            return PhraseError.GROUP_NOT_FOUND(name)
-        except Exception:
-            return PhraseError.GET_GROUP(name)
+            raise PhraseError.GROUP_NOT_FOUND(name)
+        except Exception as err: 
+            raise PhraseError.GET_GROUP(name, debug_message=err)
 
     @classmethod
-    @Excp.pack
     def new(cls, name):
         try:
             cls.get(name)
-        except Excp as ret:
-            if ret.eis(PhraseError.GROUP_NOT_FOUND):
+        except E as e:
+            if e.eis(PhraseError.GROUP_NOT_FOUND):
                 try:
                     group = cls(name=name)
                     group.save()
-                except Exception:
-                    return PhraseError.CREATE_GROUP(name)
+                except Exception as err: 
+                    raise PhraseError.CREATE_GROUP(name, debug_message=err)
             else:
-                return ret
-        return PhraseError.GROUP_NAME_CONFLICT
+                return e
+        raise PhraseError.GROUP_NAME_CONFLICT
 
-    @Excp.pack
     def push(self, phrases: List[Phrase]):
         return GroupSet.new(self, phrases)
 
@@ -368,7 +354,6 @@ class GroupSet(models.Model):
     )
 
     @classmethod
-    @Excp.pack
     def new(cls, group, phrases: List[Phrase]):
         set_ = cls(group=group)
         set_.save()
@@ -394,28 +379,26 @@ class GroupSetMember(models.Model):
         unique_together = ('set', 'phrase')
 
     @classmethod
-    @Excp.pack
     def get(cls, set_: GroupSet, phrase: Phrase):
         try:
             return cls.objects.get(set=set_, phrase=phrase)
         except cls.DoesNotExist:
-            return PhraseError.GROUPSETMEMBER_NOT_FOUND(phrase.cy)
-        except Exception:
-            return PhraseError.GET_GROUPSETMEMBER(phrase.cy)
+            raise PhraseError.GROUPSETMEMBER_NOT_FOUND(phrase.cy)
+        except Exception as err: 
+            raise PhraseError.GET_GROUPSETMEMBER(phrase.cy, debug_message=err)
 
     @classmethod
-    @Excp.pack
     def new(cls, set_: GroupSet, phrase: Phrase):
         try:
             cls.get(set_, phrase)
-        except Excp as ret:
+        except E as ret:
             if ret.eis(PhraseError.GROUPSETMEMBER_NOT_FOUND):
                 try:
                     member = cls(set=set_, phrase=phrase)
                     member.save()
                     return member
-                except Exception:
-                    return PhraseError.CREATE_GROUPSETMEMBER(phrase.cy)
+                except Exception as err: 
+                    raise PhraseError.CREATE_GROUPSETMEMBER(phrase.cy, debug_message=err)
             else:
                 return ret
-        return PhraseError.SETMEMBER_CONFLICT(phrase.cy)
+        raise PhraseError.SETMEMBER_CONFLICT(phrase.cy)

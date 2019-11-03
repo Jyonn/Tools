@@ -1,13 +1,13 @@
-from SmartDjango import models, Excp, E, ErrorJar
+from SmartDjango import models, E
 
 from Base.operation import O
 
 
-@ErrorJar.pour
+@E.register()
 class IPError:
-    IP_NOT_FOUND = E("找不到IP[{0}]", ph=E.PH_FORMAT)
-    CREATE_IP = E("增加IP[{0}]失败", ph=E.PH_FORMAT)
-    GET_IP = E("查找IP[{0}]失败", ph=E.PH_FORMAT)
+    IP_NOT_FOUND = E("找不到IP[{0}]")
+    CREATE_IP = E("增加IP[{0}]失败")
+    GET_IP = E("查找IP[{0}]失败")
 
 
 class IP(models.Model):
@@ -45,7 +45,6 @@ class IP(models.Model):
     )
 
     @classmethod
-    @Excp.pack
     def new(cls, ip_start, ip_end, country, province, city, owner, line):
         locals_ = locals()
         del locals_['cls']
@@ -56,18 +55,18 @@ class IP(models.Model):
             ip = cls(**locals_)
             ip.save()
             return ip
-        except Exception:
-            return IPError.CREATE_IP('%s, %s' % (O.ip_int2dot(ip_start), O.ip_int2dot(ip_end)))
+        except Exception as err:
+            return IPError.CREATE_IP(
+                '%s, %s' % (O.ip_int2dot(ip_start), O.ip_int2dot(ip_end)), debug_message=err)
 
     @classmethod
-    @Excp.pack
     def lookup(cls, ip):
         try:
             return cls.objects.get(ip_start__lte=ip, ip_end__gte=ip)
         except cls.DoesNotExist:
             return IPError.IP_NOT_FOUND(O.ip_int2dot(ip))
-        except Exception:
-            return IPError.GET_IP(O.ip_int2dot(ip))
+        except Exception as err:
+            return IPError.GET_IP(O.ip_int2dot(ip), debug_message=err)
 
     def _readable_ip_start(self):
         return O.ip_int2dot(self.ip_start)

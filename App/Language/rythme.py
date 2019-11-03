@@ -1,9 +1,10 @@
-from SmartDjango import Analyse, Param
+from SmartDjango import Analyse, P
+from smartify import PDict
 
 from Base.handler import BaseHandler
 from Base.param_limit import PL
 from Base.router import Router
-from Service.Language.phrase import phraseService, Syllables, SyllableClusters
+from Service.Language.phrase import Syllables, SyllableClusters
 
 
 class Rythme(BaseHandler):
@@ -26,14 +27,14 @@ class Rythme(BaseHandler):
     APP_DESC = '查找和目标押韵（支持二押及以上）的词语'
 
     BODY = [
-        Param('py', '拼音').validate(list),
-        Param('phrase', '目标词语长度限制').set_null().as_dict(
-            Param('max', '词语最大长度').set_null(), Param('min', '词语最小长度').set_null()),
-        Param('rythme', '目标词语押韵限制').set_null().as_dict(
-            Param('max', '词语最长押韵数').set_null(), Param('min', '词语最短押韵数').set_null()),
-        Param('cluster', '押韵拼音组').set_null(),
-        Param('cluster_type', '押韵拼音组模式')
-            .set_default('normal').process(PL.choices(SyllableClusters)),
+        P('py', '拼音').validate(list),
+        PDict(name='phrase', read_name='目标词语长度限制').null().set_fields(
+            P('max', '词语最大长度').null(), P('min', '词语最小长度').null()),
+        PDict(name='rythme', read_name='目标词语押韵限制').null().set_fields(
+            P('max', '词语最长押韵数').null(), P('min', '词语最短押韵数').null()),
+        P('cluster', '押韵拼音组').null(),
+        P('cluster_type', '押韵拼音组模式')
+            .default('normal').process(PL.choices(SyllableClusters)),
     ]
 
     SUB_ROUTER = Router()

@@ -1,6 +1,7 @@
 pypinyin
-django
-SmartDjango>=3.5.0.beta
+django>=2.2.5
+SmartDjango>=3.6.1.alpha2
+smartify>=0.0.1.alpha9
 gunicorn
 django-cors-headers>=2.1.0
 mysqlclient>=1.3.12

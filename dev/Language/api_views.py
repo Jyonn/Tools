@@ -1,6 +1,6 @@
 import json
 
-from SmartDjango import Excp, Analyse, Param, BaseError, P, E, ErrorJar
+from SmartDjango import Analyse, BaseError, P, E
 from SmartDjango.models import Pager
 from django.views import View
 
@@ -11,26 +11,25 @@ from Service.Language.phrase import phraseService
 
 
 PM_TAG_NAME = Tag.get_param('name')
-PM_TAG_ID = Param('tag_id', yield_name='tag').process(Tag.get_by_id)
-PM_PHRASES = Param('phrases').validate(list).process(
+PM_TAG_ID = P('tag_id', yield_name='tag').process(Tag.get_by_id)
+PM_PHRASES = P('phrases').validate(list).process(
         lambda phrases: list(map(Phrase.get_by_id, phrases)))
 PM_MATCHED = PM_PHRASES.clone().rename('matched')
 PM_UNMATCHED = PM_PHRASES.clone().rename('unmatched')
-PM_ACTION = Param('action').process(str).set_default('add')
+PM_ACTION = P('action').process(str).default('add')
 
 
-@ErrorJar.pour
+@E.register()
 class DevLangPhraseError:
     CONTRIBUTOR_NOT_FOUND = E("贡献者不存在")
 
 
-@Excp.pack
 def get_contributor(entrance):
     entrance_key = 'LangPhraseEntrance'
     entrances = json.loads(Config.get_value_by_key(entrance_key))
     if entrance in entrances:
         return entrances[entrance]
-    return DevLangPhraseError.CONTRIBUTOR_NOT_FOUND
+    raise DevLangPhraseError.CONTRIBUTOR_NOT_FOUND
 
 
 PM_ENTRANCE = P('entrance', yield_name='contributor').process(get_contributor)
@@ -38,7 +37,7 @@ PM_ENTRANCE = P('entrance', yield_name='contributor').process(get_contributor)
 
 class PhraseView(View):
     @staticmethod
-    @Analyse.r(q=[PM_TAG_ID, Param('count').process(int).process(PL.number(100, 1))])
+    @Analyse.r(q=[PM_TAG_ID, P('count').process(int).process(PL.number(100, 1))])
     def get(r):
         tag = r.d.tag
         count = r.d.count
@@ -50,7 +49,7 @@ class PhraseView(View):
         return phrases.dict(Phrase.d)
 
     @staticmethod
-    @Analyse.r(b=['cy', PM_ENTRANCE, PM_ACTION, PM_TAG_ID.clone().set_null()])
+    @Analyse.r(b=['cy', PM_ENTRANCE, PM_ACTION, PM_TAG_ID.clone().null()])
     def post(r):
         cy = r.d.cy
         action = r.d.action
@@ -128,8 +127,8 @@ class ReviewView(View):
     @staticmethod
     @Analyse.r(q=[
         PM_TAG_ID,
-        Param('count').process(int).process(PL.number(100, 1)),
-        Param('last').process(int)
+        P('count').process(int).process(PL.number(100, 1)),
+        P('last').process(int)
     ])
     def get(r):
         tag = r.d.tag

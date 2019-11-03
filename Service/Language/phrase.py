@@ -1,7 +1,7 @@
 from typing import Optional, Union, Callable
 from itertools import chain
 
-from SmartDjango import Excp, E, ErrorJar
+from SmartDjango import E
 
 from Model.Language.Phrase.models import Phrase
 
@@ -90,11 +90,11 @@ ToneJar = {
 ToneList = ['āōēīūǖ', 'áóéíúǘ', 'ǎǒěǐǔǚ', 'àòèìùǜ']
 
 
-@ErrorJar.pour
+@E.register()
 class PhraseServiceError:
-    SYLLABLE_NOT_FOUND = E("找不到音节[{0}]", ph=E.PH_FORMAT)
-    SYLLABLE_MULTIPLE_TONE = E("[{0}]音节存在多个声调", ph=E.PH_FORMAT)
-    SYLLABLE_FORMAT = E("[{0}]音节格式错误{1}", ph=E.PH_FORMAT)
+    SYLLABLE_NOT_FOUND = E("找不到音节[{0}]")
+    SYLLABLE_MULTIPLE_TONE = E("[{0}]音节存在多个声调")
+    SYLLABLE_FORMAT = E("[{0}]音节格式错误{1}")
 
 
 class PhraseService:
@@ -134,7 +134,6 @@ class PhraseService:
     def _get_intersection(syllable_set: set, s: str):
         return syllable_set & set(s)
 
-    @Excp.pack
     def format_syllable(self, syllable: str, printer: Union[str, Callable] = 'toner') -> str:
         """格式化不标准的音节"""
         syllable = syllable.lower()
@@ -179,7 +178,6 @@ class PhraseService:
         formatted_syllable = printer(formatted_syllable, tone)
         return formatted_syllable
 
-    @Excp.pack
     def rythme_match(self, phrase, cluster, phrase_limit, rythme_limit):
         result = dict()
         phrases = self.phrases

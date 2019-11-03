@@ -1,9 +1,9 @@
-from SmartDjango import P, E, ErrorJar
+from SmartDjango import P, E, Hc
 
 
-@ErrorJar.pour
+@E.register()
 class HandlerError:
-    HANDLER_NOT_IMPLEMENTED = E("未实现的功能")
+    HANDLER_NOT_IMPLEMENTED = E("未实现的功能", hc=Hc.NotImplemented)
 
 
 class BaseHandler:
@@ -28,14 +28,17 @@ class BaseHandler:
         d_ = dict(
             name=param.name,
             desc=param.read_name,
-            allow_null=param.null,
-            has_default=param.has_default(),
-            is_dict=param.dict,
-            is_list=param.list,
-            children=list(map(cls.readable_param, param.children))
+            allow_null=param.allow_null,
+            has_default=param.has_default,
+            type_='dict' if param.is_dict else 'list' if param.is_list else 'atom',
         )
-        if param.has_default():
-            d_['default_value'] = param.default
+        if param.has_default:
+            d_['default_value'] = param.default_value
+            d_['default_through_processors'] = param.default_through_processors
+        if param.is_dict:
+            d_['dict_fields'] = list(map(cls.readable_param, param.dict_fields))
+        if param.is_list and param.list_child:
+            d_['list_child'] = cls.readable_param(param.list_child)
         return d_
 
     def rename(self, app_name=None, app_desc=None):

@@ -1,4 +1,4 @@
-from SmartDjango import Param, Analyse, P
+from SmartDjango import Analyse, P, Processor
 
 from Base.handler import BaseHandler
 from Base.router import Router
@@ -30,14 +30,14 @@ class UnicodeFont(BaseHandler):
     APP_DESC = '将正常的英文变为粗体、斜体、花体等，支持微博、朋友圈等常见APP'
 
     BODY = [
-        Param('sentence', '句子').validate(str),
-        Param('letter_font_id', '英文字体ID')
-            .process(P.Processor(unicodeFontService.letter_font_jar.get, yield_name='letter_font'))
-            .set_null(),
-        Param('digit_font_id', '数字字体ID')
-            .process(P.Processor(unicodeFontService.digit_font_jar.get, yield_name='digit_font'))
-            .set_null(),
-        Param('purify', '是否进行字体清洁').validate(bool).set_default(True),
+        P('sentence', '句子').validate(str),
+        P('letter_font_id', '英文字体ID')
+            .process(Processor(unicodeFontService.letter_font_jar.get, yield_name='letter_font'))
+            .null(),
+        P('digit_font_id', '数字字体ID')
+            .process(Processor(unicodeFontService.digit_font_jar.get, yield_name='digit_font'))
+            .null(),
+        P('purify', '是否进行字体清洁').validate(bool).default(True),
     ]
 
     REQUEST_EXAMPLE = {
