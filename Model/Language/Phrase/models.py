@@ -191,7 +191,7 @@ class Tag(models.Model):
                 return tag
             else:
                 return e
-        raise PhraseError.TAG_NAME_CONFLICT
+        raise PhraseError.TAG_NAME_CONFLICT(name)
 
     def put(self, name):
         self.name = name
@@ -340,7 +340,7 @@ class Group(models.Model):
                     raise PhraseError.CREATE_GROUP(name, debug_message=err)
             else:
                 return e
-        raise PhraseError.GROUP_NAME_CONFLICT
+        raise PhraseError.GROUP_NAME_CONFLICT(name)
 
     def push(self, phrases: List[Phrase]):
         return GroupSet.new(self, phrases)

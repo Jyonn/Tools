@@ -56,7 +56,7 @@ class IP(models.Model):
             ip.save()
             return ip
         except Exception as err:
-            return IPError.CREATE_IP(
+            raise IPError.CREATE_IP(
                 '%s, %s' % (O.ip_int2dot(ip_start), O.ip_int2dot(ip_end)), debug_message=err)
 
     @classmethod
@@ -64,9 +64,9 @@ class IP(models.Model):
         try:
             return cls.objects.get(ip_start__lte=ip, ip_end__gte=ip)
         except cls.DoesNotExist:
-            return IPError.IP_NOT_FOUND(O.ip_int2dot(ip))
+            raise IPError.IP_NOT_FOUND(O.ip_int2dot(ip))
         except Exception as err:
-            return IPError.GET_IP(O.ip_int2dot(ip), debug_message=err)
+            raise IPError.GET_IP(O.ip_int2dot(ip), debug_message=err)
 
     def _readable_ip_start(self):
         return O.ip_int2dot(self.ip_start)

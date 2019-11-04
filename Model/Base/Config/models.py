@@ -48,11 +48,11 @@ class Config(models.Model):
                     )
                     config.save()
                 except Exception as err:
-                    return ConfigError.CREATE_CONFIG(debug_message=err)
+                    raise ConfigError.CREATE_CONFIG(debug_message=err)
             else:
                 raise e
         except Exception as err:
-            return ConfigError.CREATE_CONFIG(debug_message=err)
+            raise ConfigError.CREATE_CONFIG(debug_message=err)
 
 
 class ConfigInstance:
