@@ -1,3 +1,4 @@
+requests
 pypinyin
 django>=2.2.5
 SmartDjango>=3.6.1.alpha6
