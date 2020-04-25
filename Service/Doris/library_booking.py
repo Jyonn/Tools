@@ -124,7 +124,10 @@ class LibraryBookingService:
         with session.get(BOOKING_URI % (act_id, phone)) as r:
             result = r.json()
         if result["msg"] == '申请成功':
-            return result['data']['list']['applicantName'] + result['msg']
+            username = result['data']['list']['applicantName']
+            if username == '陈艳萍':
+                username = '猪猪🐷'
+            return username + result['msg']
         else:
             raise LibraryBookingServiceError.BOOK_FAIL(append_message=result["msg"])
 
