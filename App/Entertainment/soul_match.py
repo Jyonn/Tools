@@ -1,3 +1,7 @@
+"""
+关闭入口@200425
+"""
+
 import requests
 from SmartDjango import P, Analyse
 
