@@ -47,10 +47,12 @@ class LibraryBookingService:
     def recognize_captcha(session):
         retry_time = 5
         captcha = ''
+        recognized = False
 
         while retry_time:
             retry_time -= 1
             time.sleep(1)
+            recognized = True
 
             try:
                 with session.get(CAPTCHA_URI, headers={"Referer": WEB_URI}) as r:
@@ -62,6 +64,7 @@ class LibraryBookingService:
                 result = ''
 
             if len(result) != 4:
+                recognized = False
                 continue
 
             captcha = ''
@@ -71,11 +74,12 @@ class LibraryBookingService:
                 elif digit in replace_table:
                     captcha += str(replace_table[digit])
                 else:
+                    recognized = False
                     continue
 
             break
 
-        if len(captcha) != 4:
+        if not recognized:
             raise LibraryBookingServiceError.RETRY_TIME_EXPIRE
 
         return captcha
@@ -87,7 +91,14 @@ class LibraryBookingService:
         retry_time = 3
         while retry_time:
             retry_time -= 1
-            captcha = cls.recognize_captcha(session)
+
+            try:
+                captcha = cls.recognize_captcha(session)
+            except E as err:
+                if retry_time:
+                    continue
+                else:
+                    raise err
 
             with session.post(LOGIN_URI, data={
                 "username": student_id,
