@@ -132,5 +132,5 @@ class LibraryBookingService:
     def view_remain():
         with requests.get(WEB_URI) as r:
             html = r.content.decode()
-        remain = re.search('剩余预约<b> (\d+) </b>人', html, flags=re.S).groups(1)
+        remain = re.search('剩余预约<b> (\d+) </b>人', html, flags=re.S).group(1)
         return int(remain)
