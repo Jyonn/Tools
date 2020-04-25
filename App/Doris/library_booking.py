@@ -9,9 +9,10 @@ class LibraryBooking(BaseHandler):
     APP_DESC = '浙江工商大学疫情期间的图书馆便捷预约'
 
     BODY = [
-        P('id', '一卡通号'),
+        P('id', '一卡通号').default(None),
         P('password', '密码').default('000'),
-        P('phone', '电话号码'),
+        P('phone', '电话号码').default(None),
+        P('view_only').default(False),
     ]
 
     @staticmethod
@@ -20,5 +21,8 @@ class LibraryBooking(BaseHandler):
         student_id = r.d.id
         password = r.d.password
         phone = r.d.phone
+        view_only = r.d.view_only
+        if view_only:
+            return LibraryBookingService.view_remain()
         return LibraryBookingService.book(str(student_id), password, phone)
 
