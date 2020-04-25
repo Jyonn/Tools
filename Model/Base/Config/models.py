@@ -56,7 +56,9 @@ class Config(models.Model):
 
 
 class ConfigInstance:
-    pass
+    LibBooking_BD_APP_ID = "LibBooking-BD-APP-ID"
+    LibBooking_BD_APP_KEY = "LibBooking-BD-APP-KEY"
+    LibBooking_BD_APP_SECRET = "LibBooking-BD-APP-SECRET"
 
 
 CI = ConfigInstance
