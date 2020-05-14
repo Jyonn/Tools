@@ -21,7 +21,7 @@ class CharacterToPinyin(BaseHandler):
     def run(r):
         text = r.d.text
         if len(text) == 1:
-            pinyin = pypinyin.pinyin(text, heteronym=True, errors=lambda _: [None])
+            pinyin = pypinyin.pinyin(text, heteronym=r.d.heteronym_when_single, errors=lambda _: [None])
             return pinyin[0]
 
         pinyin = pypinyin.pinyin(text, errors=lambda _: [None])
