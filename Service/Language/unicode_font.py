@@ -18,6 +18,9 @@ LTinyItalic = LetterFont('超小体-斜', '𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐�
 LTinyBoldItalic = LetterFont('超小体-粗斜', '𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕', '𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯').tiny().set_bold().set_italic()
 LDot = LetterFont('点阵体', '𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉', '𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣').dot()
 LDouble = LetterFont('全角', 'ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ', 'ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ').double()
+LBubble = LetterFont('冒泡体', 'ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ', 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ').odd()
+LKid = LetterFont('儿童体', 'ᗩᗷᑕᗪEᖴGᕼIᒍKᒪᗰᑎOᑭᑫᖇᔕTᑌᐯᗯ᙭Yᘔ', 'ᗩᗷᑕᗪEᖴGᕼIᒍKᒪᗰᑎOᑭᑫᖇᔕTᑌᐯᗯ᙭Yᘔ').odd().unsupport('EGIKOTYegikoty')
+LTinier = LetterFont('极小体', 'ᴀʙᴄᴅᴇᴈɢʜɪᴊᴋʟᴍɴᴏᴘᴓʀᴤᴛᴜᴠᴡᴥʏᴢ', 'ᴀʙᴄᴅᴇᴈɢʜɪᴊᴋʟᴍɴᴏᴘᴓʀᴤᴛᴜᴠᴡᴥʏᴢ').tiny()
 
 LetterFonts = [
     LNormalBoldItalic,
@@ -35,6 +38,9 @@ LetterFonts = [
     LTinyBoldItalic,
     LDot,
     LDouble,
+    LBubble,
+    LKid,
+    LTinier,
 ]
 
 DNormalBold = DigitFont('常规-粗', '𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗').normal().set_bold()
