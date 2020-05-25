@@ -1,3 +1,5 @@
+import datetime
+
 from SmartDjango import P, Analyse
 
 from Base.handler import BaseHandler
@@ -13,6 +15,8 @@ class LibraryBooking(BaseHandler):
         P('password', '密码').default('000'),
         P('phone', '电话号码').default(None),
         P('view_only').default(False),
+        P('list_date').default(False),
+        P('date').default(False),
     ]
 
     @staticmethod
@@ -22,7 +26,14 @@ class LibraryBooking(BaseHandler):
         password = r.d.password
         phone = r.d.phone
         view_only = r.d.view_only
+        list_date = r.d.list_date
+        date = r.d.date
+
+        if list_date:
+            return LibraryBookingService.list_date()
+        if not date:
+            date = datetime.datetime.now().strftime('%Y-%m-%d')
         if view_only:
-            return LibraryBookingService.view_remain()
-        return LibraryBookingService.book(str(student_id), password, phone)
+            return LibraryBookingService.view_remain(date)
+        return LibraryBookingService.book(date, str(student_id), password, phone)
 

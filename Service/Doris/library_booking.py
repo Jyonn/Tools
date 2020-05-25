@@ -85,7 +85,7 @@ class LibraryBookingService:
         return captcha
 
     @classmethod
-    def book(cls, student_id, password, phone):
+    def book(cls, date, student_id, password, phone):
         session = requests.Session()
 
         retry_time = 3
@@ -116,7 +116,7 @@ class LibraryBookingService:
 
             break
 
-        with session.get(WEB_URI) as r:
+        with session.get(cls.get_date_url(date)) as r:
             html = r.content.decode()
         act_id = re.search(
             '<a href="/book/notice/act_id/(\d+)/type/4/lib/11">', html, flags=re.S).group(1)
@@ -132,11 +132,23 @@ class LibraryBookingService:
             raise LibraryBookingServiceError.BOOK_FAIL(append_message=result["msg"])
 
     @staticmethod
-    def view_remain():
+    def list_date():
         with requests.get(WEB_URI) as r:
+            html = r.content.decode()
+        dates = re.findall('area_day" href="/home/book/more/lib/11/type/4/day/(.*?)" role="button">(.*?)</a>', html, flags=re.S)
+        dates = dates[:len(dates) // 2]
+        return [dict(url=date[0], read=date[1].split(' ')[-1]) for date in dates]
+
+    @classmethod
+    def view_remain(cls, date):
+        with requests.get(cls.get_date_url(date)) as r:
             html = r.content.decode()
         remain = re.search('剩余预约<b> (\d+) </b>人', html, flags=re.S)
         if remain:
             return int(remain.group(1))
         else:
-            return 0
+            return -1
+
+    @staticmethod
+    def get_date_url(date):
+        return WEB_URI + '/day/' + str(date)
