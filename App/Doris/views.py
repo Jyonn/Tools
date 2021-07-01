@@ -3,4 +3,4 @@ from Base.router import Router
 
 dorisRouter = Router()
 
-dorisRouter.register('library-booking', LibraryBooking)
+dorisRouter.register('library-booking', LibraryBooking, disabled=True)

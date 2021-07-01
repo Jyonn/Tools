@@ -22,6 +22,6 @@ urlpatterns = [
 ]
 
 # if platform.system() == 'Darwin':
-urlpatterns += [
-    path('dev/', include('Tools.dev_urls'))
-]
+# urlpatterns += [
+#     path('dev/', include('Tools.dev_urls'))
+# ]
