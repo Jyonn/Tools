@@ -14,11 +14,9 @@ LOGIN_URI = LB_HOST + "/api.php/login"
 CAPTCHA_URI = LB_HOST + "/api.php/check"
 BOOKING_URI = LB_HOST + "/api.php/activities/%s/application2?mobile=%s"
 
-
 bd_app_id = Config.get_value_by_key(CI.LibBooking_BD_APP_ID)
 bd_app_key = Config.get_value_by_key(CI.LibBooking_BD_APP_KEY)
 bd_app_secret = Config.get_value_by_key(CI.LibBooking_BD_APP_SECRET)
-print(bd_app_id, bd_app_key, bd_app_secret)
 
 replace_table = {
     "o": 0, "O": 0, "。": 0,
