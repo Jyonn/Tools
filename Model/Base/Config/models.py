@@ -60,5 +60,11 @@ class ConfigInstance:
     LibBooking_BD_APP_KEY = "LibBooking-BD-APP-KEY"
     LibBooking_BD_APP_SECRET = "LibBooking-BD-APP-SECRET"
 
+    FOTO_QN_ACCESS_KEY = 'Foto-QN-ACCESS-KEY'
+    FOTO_QN_SECRET_KEY = 'Foto-QN-SECRET-KEY'
+    FOTO_QN_RES_BUCKET = 'Foto-QN-RES-BUCKET'
+    FOTO_QN_CDN_HOST = 'Foto-QN-CDN-HOST'
+    FOTO_ADMIN_TOKEN = 'Foto-ADMIN-TOKEN'
+
 
 CI = ConfigInstance

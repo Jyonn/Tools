@@ -11,7 +11,7 @@ sys.path.extend(['../..'])
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Tools.settings")
 django.setup()
 
-from Model.Language.Phrase.models import Phrase, Tag, TagMap, Group, GroupSet, GroupSetMember
+from Model.Language.Phrase.models import Phrase
 from Service.Language.phrase import phraseService
 
 
