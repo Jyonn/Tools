@@ -18,7 +18,8 @@ import platform
 from django.urls import path, include
 
 urlpatterns = [
-    path('v1/', include('Tools.api_urls'))
+    path('v1/', include('Tools.api_urls')),
+    path('dev/', include('Tools.dev_urls')),
 ]
 
 # if platform.system() == 'Darwin':

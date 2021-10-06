@@ -18,6 +18,7 @@ class CallbackView(View):
         'image_info',
     ])
     def post(r):
+        print(r.d.dict())
         qn_manager.auth_callback(r)
 
         color_average = r.d.color_average['RGB']  # type: str
@@ -47,8 +48,7 @@ class CallbackView(View):
 class TokenView(View):
     @staticmethod
     @Analyse.r(
-        a=[AlbumP.name_getter],
-        q=[P('image_num', '图片数量').process(boundary(max_=99, min_=1))]
+        q=[AlbumP.name_getter, P('image_num', '图片数量').process(boundary(max_=99, min_=1))]
     )
     @Auth.require_admin
     def get(r):
@@ -81,3 +81,32 @@ class AlbumView(View):
     def get(r):
         album = r.d.album
         return album.d_with_fotos()
+
+    @staticmethod
+    @Analyse.r(
+        a=[AlbumP.name_getter]
+    )
+    @Auth.require_admin
+    def post(_):
+        return 0
+
+    @staticmethod
+    @Analyse.r(
+        a=[AlbumP.name_getter],
+        b=[AlbumP.name]
+    )
+    @Auth.require_admin
+    def put(r):
+        album = r.d.album
+        album.rename(r.d.name)
+        return album.d()
+
+    @staticmethod
+    @Analyse.r(
+        a=[AlbumP.name_getter]
+    )
+    @Auth.require_admin
+    def delete(r):
+        album = r.d.album
+        album.remove()
+        return 0

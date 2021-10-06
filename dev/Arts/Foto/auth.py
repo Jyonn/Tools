@@ -1,4 +1,5 @@
 from functools import wraps
+from hashlib import md5
 
 from SmartDjango import E
 
@@ -12,9 +13,15 @@ class AuthError:
 
 class Auth:
     @staticmethod
-    def validate_token(request):
+    def get_md5(s):
+        m = md5()
+        m.update(s.encode())
+        return m.hexdigest()
+
+    @classmethod
+    def validate_token(cls, request):
         token = request.META.get('HTTP_TOKEN')
-        if token != ADMIN_TOKEN:
+        if not token or cls.get_md5(token) != ADMIN_TOKEN:
             raise AuthError.ADMIN
 
     @classmethod
@@ -22,7 +29,6 @@ class Auth:
         @wraps(func)
         def wrapper(r, *args, **kwargs):
             cls.validate_token(r)
-            r.spaceman = r.d.image.get_member(r.user)
             return func(r, *args, **kwargs)
 
         return wrapper

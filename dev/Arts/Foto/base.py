@@ -9,9 +9,14 @@ SECRET_KEY = Config.get_value_by_key(CI.FOTO_QN_SECRET_KEY)
 RES_BUCKET = Config.get_value_by_key(CI.FOTO_QN_RES_BUCKET)
 RES_CDN_HOST = Config.get_value_by_key(CI.FOTO_QN_CDN_HOST)
 ADMIN_TOKEN = Config.get_value_by_key(CI.FOTO_ADMIN_TOKEN)
+MAX_IMAGE_SIZE = int(Config.get_value_by_key(CI.FOTO_MAX_IMAGE_SIZE))
 
 
-AUTH = qiniu.Auth(access_key=ACCESS_KEY, secret_key=SECRET_KEY)
+try:
+    AUTH = qiniu.Auth(access_key=ACCESS_KEY, secret_key=SECRET_KEY)
+except Exception as err:
+    AUTH = None
+
 qn_manager = QnManager(
     auth=AUTH,
     bucket=RES_BUCKET,
@@ -21,7 +26,7 @@ qn_manager = QnManager(
 )
 policy = Policy(
     callback_url='https://tools.6-79.cn/dev/arts/foto/callback',
-    max_image_size=20 * 1024 * 1024,
+    max_image_size=MAX_IMAGE_SIZE,
 )
 
 

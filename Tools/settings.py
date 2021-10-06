@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'Model.Language.Phrase',
     'Model.Base.Config',
     'Model.Network.IP',
+    'Model.Arts.Foto',
 ]
 
 MIDDLEWARE = [

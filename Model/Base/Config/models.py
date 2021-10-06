@@ -65,6 +65,7 @@ class ConfigInstance:
     FOTO_QN_RES_BUCKET = 'Foto-QN-RES-BUCKET'
     FOTO_QN_CDN_HOST = 'Foto-QN-CDN-HOST'
     FOTO_ADMIN_TOKEN = 'Foto-ADMIN-TOKEN'
+    FOTO_MAX_IMAGE_SIZE = 'Foto-MAX-IMAGE-SIZE'
 
 
 CI = ConfigInstance
