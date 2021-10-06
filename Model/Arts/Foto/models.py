@@ -233,7 +233,7 @@ class Foto(models.Model):
 
 class AlbumP:
     name = Album.get_param('name')
-    name_getter = name.clone().rename('album').process(Album.get)
+    name_getter = name.clone().rename('album').process(Album.get_by_name)
     name_creator = name.clone().rename('album').process(Album.create)
 
 
