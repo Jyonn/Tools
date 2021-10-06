@@ -86,8 +86,9 @@ class FotoView(View):
     @staticmethod
     @Analyse.r(
         a=[FotoP.id_getter],
-        b=[AlbumP.name_getter],
+        b=[AlbumP.name_creator],
     )
+    @Auth.require_admin
     def put(r):
         foto = r.d.foto
         album = r.d.album
@@ -106,7 +107,7 @@ class AlbumView(View):
 
     @staticmethod
     @Analyse.r(
-        a=[AlbumP.name_getter]
+        a=[AlbumP.name_creator]
     )
     @Auth.require_admin
     def post(_):
@@ -114,7 +115,7 @@ class AlbumView(View):
 
     @staticmethod
     @Analyse.r(
-        a=[AlbumP.name_getter],
+        a=[AlbumP.name_creator],
         b=[AlbumP.name]
     )
     @Auth.require_admin
