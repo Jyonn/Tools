@@ -1,10 +1,11 @@
 from django.urls import path
 
-from dev.Arts.Foto.api_views import CallbackView, TokenView, HomeView, AlbumView
+from dev.Arts.Foto import api_views as views
 
 urlpatterns = [
-    path('callback', CallbackView.as_view()),
-    path('token', TokenView.as_view()),
-    path('', HomeView.as_view()),
-    path('album/<str:album>', AlbumView.as_view()),
+    path('callback', views.CallbackView.as_view()),
+    path('token', views.TokenView.as_view()),
+    path('<str:foto>', views.FotoView.as_view()),
+    path('', views.HomeView.as_view()),
+    path('album/<str:album>', views.AlbumView.as_view()),
 ]
