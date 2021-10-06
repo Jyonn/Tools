@@ -25,7 +25,7 @@ qn_manager = QnManager(
     prefix='Foto/'
 )
 policy = Policy(
-    callback_url='https://tools.6-79.cn/dev/arts/foto/callback',
+    callback_url='https://tools.6-79.cn/dev/api/arts/foto/callback',
     max_image_size=MAX_IMAGE_SIZE,
 )
 
