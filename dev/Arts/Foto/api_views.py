@@ -16,6 +16,7 @@ class CallbackView(View):
         'mime_type',
         'color_average',
         'image_info',
+        AlbumP.name_getter,
     ])
     def post(r):
         print(r.d.dict())
@@ -35,7 +36,7 @@ class CallbackView(View):
         width, height = foto_info['width'], foto_info['height']
 
         foto = Foto.create(
-            **r.d.dict('key', 'mime_type'),
+            **r.d.dict('key', 'mime_type', 'album'),
             color_average=color_average,
             width=width,
             height=height,

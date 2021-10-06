@@ -163,13 +163,6 @@ class Foto(models.Model):
             raise FotoError.CREATE(debug_message=err)
 
     @classmethod
-    def get_token(cls, action, **kwargs):
-        kwargs.update(dict(action=action))
-        key = hex(int(datetime.datetime.now().timestamp() * 1000))
-        key = key + '/' + get_random_string(length=16)
-        return qn_manager.get_upload_token(key=key, policy=policy.customize(**kwargs))
-
-    @classmethod
     def get_tokens(cls, num, **kwargs):
         key_prefix = hex(int(datetime.datetime.now().timestamp() * 1000))
 
