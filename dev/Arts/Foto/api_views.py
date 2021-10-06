@@ -2,7 +2,7 @@ from SmartDjango import Analyse
 from django.views import View
 from smartify import P
 
-from Model.Arts.Foto.models import Foto, AlbumP, Album
+from Model.Arts.Foto.models import Foto, AlbumP, Album, FotoP
 from dev.Arts.Foto.auth import Auth
 from dev.Arts.Foto.base import qn_manager, boundary
 
@@ -72,6 +72,27 @@ class HomeView(View):
             albums=albums,
             fotos=fotos,
         )
+
+
+class FotoView(View):
+    @staticmethod
+    @Analyse.r(
+        a=[FotoP.id_getter]
+    )
+    def get(r):
+        foto = r.d.foto
+        return foto.d()
+
+    @staticmethod
+    @Analyse.r(
+        a=[FotoP.id_getter],
+        b=[AlbumP.name_getter],
+    )
+    def put(r):
+        foto = r.d.foto
+        album = r.d.album
+        foto.set_album(album)
+        return foto.d_base()
 
 
 class AlbumView(View):

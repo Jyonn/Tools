@@ -139,6 +139,10 @@ class Foto(models.Model):
         s[1 - o // 4] = 'LEFT' if orientation in [1, 4, 5, 8] else 'RIGHT'
         return '-'.join(s)
 
+    def set_album(self, album):
+        self.album = album
+        self.save()
+
     @classmethod
     def get(cls, foto_id):
         try:
@@ -207,6 +211,9 @@ class Foto(models.Model):
     def _readable_orientation(self):
         return [self.orientation, self.orientation_int2str(self.orientation)]
 
+    def _readable_album(self):
+        return self.album.name
+
     def d(self):
         return self.dictify(
             'source',
@@ -214,9 +221,20 @@ class Foto(models.Model):
             'height',
             'foto_id',
             'orientation',
+            'album'
+        )
+
+    def d_base(self):
+        return self.dictify(
+            'album',
+            'foto_id',
         )
 
 
 class AlbumP:
     name = Album.get_param('name')
-    name_getter = name.clone().rename('album').process(Album.create)
+    name_getter = name.clone().rename('album').process(Album.create).default()
+
+
+class FotoP:
+    id_getter = Foto.get_param('foto_id').clone().rename('foto').process(Foto.get)
