@@ -49,7 +49,7 @@ class CallbackView(View):
 class TokenView(View):
     @staticmethod
     @Analyse.r(
-        q=[AlbumP.name_getter, P('image_num', '图片数量').process(boundary(max_=99, min_=1))]
+        q=[AlbumP.name_creator, P('image_num', '图片数量').process(boundary(max_=99, min_=1))]
     )
     @Auth.require_admin
     def get(r):
