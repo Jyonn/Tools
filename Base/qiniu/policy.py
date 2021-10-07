@@ -30,6 +30,6 @@ class Policy:
             callbackBodyType='application/json',
             fsizeMin=1,
             fsizeLimit=self.max_image_size,
-            mimeLimit='image/png;image/jpeg;image/heic',
+            mimeLimit='image/png;image/jpeg;image/heic;image/heif',
         ))
         return policy
