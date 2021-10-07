@@ -12,9 +12,9 @@ class FotoError:
     CREATE = E("图片上传失败")
     AS_COVER = E("相册封面无法删除")
 
-    ALBUM_CREATE = E("新增标签失败")
-    FOTO_ALBUM_CREATE = E("标签绑定失败")
-    ALBUM_NOT_FOUND = E("标签不存在")
+    ALBUM_CREATE = E("新增相册失败")
+    FOTO_ALBUM_CREATE = E("相册绑定失败")
+    ALBUM_NOT_FOUND = E("相册不存在")
 
 
 class Album(models.Model):
@@ -188,15 +188,6 @@ class Foto(models.Model):
             rotate=self.get_source(auto_rotate=True, resize=None)
         )
 
-    def get_tiny_source_with_color(self, resize=None, with_origin=False):
-        d = dict(
-            source=self.get_source(auto_rotate=True, resize=resize),
-            color=self.color_average,
-        )
-        if with_origin:
-            d["origin"] = self.get_source(auto_rotate=False, resize=None)
-        return d
-
     def delete(self, *args, **kwargs):
         qn_manager.delete_res(self.key)
         super().delete(*args, **kwargs)
@@ -205,8 +196,13 @@ class Foto(models.Model):
     def get_pinned_fotos(cls):
         return cls.objects.filter(pinned=True)
 
-    def _readable_source(self):
-        return self.get_tiny_source_with_color(with_origin=True)
+    def _readable_sources(self):
+        return dict(
+            color=self.color_average,
+            rotate=self.get_source(auto_rotate=True, resize=None),
+            origin=self.get_source(auto_rotate=False, resize=None),
+            square=self.get_source(auto_rotate=True, resize=(600, 600)),
+        )
 
     def _readable_orientation(self):
         return [self.orientation, self.orientation_int2str(self.orientation)]
@@ -216,7 +212,7 @@ class Foto(models.Model):
 
     def d(self):
         return self.dictify(
-            'source',
+            'sources',
             'width',
             'height',
             'foto_id',
