@@ -201,7 +201,7 @@ class Foto(models.Model):
             color=self.color_average,
             rotate=self.get_source(auto_rotate=True, resize=None),
             origin=self.get_source(auto_rotate=False, resize=None),
-            square=self.get_source(auto_rotate=True, resize=(200, 200)),
+            square=self.get_source(auto_rotate=True, resize=(600, 600)),
         )
 
     def _readable_orientation(self):
