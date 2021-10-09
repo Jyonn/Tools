@@ -188,9 +188,9 @@ class Foto(models.Model):
             rotate=self.get_source(auto_rotate=True, resize=None)
         )
 
-    def delete(self, *args, **kwargs):
+    def remove(self):
         qn_manager.delete_res(self.key)
-        super().delete(*args, **kwargs)
+        self.delete()
 
     @classmethod
     def get_pinned_fotos(cls):

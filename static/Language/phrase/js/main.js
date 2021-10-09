@@ -139,7 +139,6 @@ class PhrasePage {
         let phraseColumn = stringToHtml(phraseColumnTemplate());
         let phraseItemsElement = phraseColumn.getElementsByClassName('phrase-items')[0];
         phraseItems.forEach(phraseItem => phraseItemsElement.appendChild(phraseItem));
-        // let html = stringToHtml(phraseColumnTemplate(phraseItems));
         this.body.appendChild(phraseColumn);
     }
 

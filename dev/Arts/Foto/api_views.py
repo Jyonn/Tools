@@ -95,6 +95,16 @@ class FotoView(View):
         foto.set_album(album)
         return foto.d_base()
 
+    @staticmethod
+    @Analyse.r(
+        a=[FotoP.id_getter],
+    )
+    @Auth.require_admin
+    def delete(r):
+        foto = r.d.foto
+        foto.remove()
+        return 0
+
 
 class AlbumView(View):
     @staticmethod
