@@ -20,6 +20,10 @@ class Request {
         this._handler = null;
     }
 
+    static loadToken() {
+        this.token = Store.load('token');
+    }
+
     static saveToken(token) {
         this.token = token;
         Store.save('token', token);

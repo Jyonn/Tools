@@ -16,6 +16,23 @@ class FotoPage {
 
         this.fileInput.addEventListener('change', this.uploadFiles.bind(this))
         this.uploadFileList = []
+
+        Request.setHandler(this.requestHandler.bind(this))
+    }
+
+    getToken() {
+        Request.loadToken()
+        if (!Request.token) {
+            Request.saveToken(prompt('Admin Token'))
+        }
+    }
+
+    requestHandler(resp) {
+        if (resp.identifier === 'AUTH-ADMIN') {
+            Request.saveToken(prompt('Admin Token'))
+        } else {
+            alert(resp.msg)
+        }
     }
 
     activateRemoveMode() {
@@ -70,10 +87,6 @@ class FotoPage {
         deactivate(this.buttonBox)
     }
 
-    getToken() {
-        Request.saveToken(prompt('Admin Token'))
-    }
-
     initAlbumBox() {
         let albumTemplate = template`<div class="album" onclick="fotoPage.fetchAlbum('${0}')">${0}</div>`
         let selectedAlbumTemplate = template`<div class="album selected" onclick="fotoPage.fetchAlbum('${0}')">${0}</div>`
@@ -124,6 +137,8 @@ class FotoPage {
             Request.delete('https://tools.6-79.cn/dev/api/arts/foto/' + foto_id).then(_ => {
                 this.fetchAlbum(this.currentAlbum)
             })
+        } else if (this.pinActive) {
+
         }
     }
 
@@ -175,8 +190,6 @@ class FotoPage {
                         this.uploadFileList[i].uploaded = true
                         this.initFotoBox()
                     })
-                this.clearUploadFiles()
-                this.fetchAlbum(this.currentAlbum)
             }
         })
     }
@@ -201,6 +214,15 @@ class FotoPage {
     confirmUploadFiles() {
         if (confirm('Confirm Upload?')) {
             this.fetchUploadTokens()
+        }
+    }
+
+    destroyAlbum() {
+        if (confirm('Confirm Destroy Album?')) {
+            Request.delete('https://tools.6-79.cn/dev/api/arts/foto/album/' + this.currentAlbum)
+                .then(_ => {
+                    this.fetchHomePage()
+                })
         }
     }
 

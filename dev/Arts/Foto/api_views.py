@@ -86,13 +86,11 @@ class FotoView(View):
     @staticmethod
     @Analyse.r(
         a=[FotoP.id_getter],
-        b=[AlbumP.name_creator],
     )
     @Auth.require_admin
     def put(r):
         foto = r.d.foto
-        album = r.d.album
-        foto.set_album(album)
+        foto.toggle_pin()
         return foto.d_base()
 
     @staticmethod

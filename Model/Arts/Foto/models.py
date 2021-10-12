@@ -143,6 +143,10 @@ class Foto(models.Model):
         self.album = album
         self.save()
 
+    def toggle_pin(self):
+        self.pinned = not self.pinned
+        self.save()
+
     @classmethod
     def get(cls, foto_id):
         try:
