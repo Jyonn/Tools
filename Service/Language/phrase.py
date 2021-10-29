@@ -11,7 +11,7 @@ Syllables = [
     ['an', 'ban', 'bian', 'can', 'chan', 'chuan', 'cuan', 'dan', 'dian', 'duan', 'fan', 'gan', 'guan', 'han', 'huan', 'jian', 'juan', 'kan', 'kuan', 'lan', 'lian', 'luan', 'man', 'mian', 'nan', 'nian', 'nuan', 'pan', 'pian', 'qian', 'quan', 'ran', 'ruan', 'san', 'shan', 'shuan', 'suan', 'tan', 'tian', 'tuan', 'wan', 'xian', 'xuan', 'yan', 'yuan', 'zan', 'zhan', 'zhuan', 'zuan'],
     ['ang', 'bang', 'cang', 'chang', 'chuang', 'dang', 'fang', 'gang', 'guang', 'hang', 'huang', 'jiang', 'kang', 'kuang', 'lang', 'liang', 'mang', 'nang', 'niang', 'pang', 'qiang', 'rang', 'sang', 'shang', 'shuang', 'tang', 'wang', 'xiang', 'yang', 'zang', 'zhang', 'zhuang'],
     ['ao', 'bao', 'biao', 'cao', 'chao', 'dao', 'diao', 'gao', 'hao', 'jiao', 'kao', 'lao', 'liao', 'mao', 'miao', 'nao', 'niao', 'pao', 'piao', 'qiao', 'rao', 'sao', 'shao', 'tao', 'tiao', 'xiao', 'yao', 'zao', 'zhao'],
-    ['bei', 'dei', 'ei', 'fei', 'gei', 'hei', 'lei', 'mei', 'nei', 'pei', 'rui', 'shei', 'tei', 'wei', 'zei', 'zhei'],
+    ['bei', 'dei', 'ei', 'fei', 'gei', 'hei', 'lei', 'mei', 'nei', 'pei', 'rui', 'shei', 'tei', 'wei', 'zei', 'zhei', 'kei'],
     ['ben', 'cen', 'chen', 'den', 'en', 'fen', 'gen', 'hen', 'ken', 'men', 'nen', 'pen', 'ren', 'sen', 'shen', 'wen', 'zen', 'zhen', 'n'],
     ['beng', 'ceng', 'cheng', 'deng', 'eng', 'feng', 'geng', 'heng', 'keng', 'leng', 'meng', 'neng', 'peng', 'reng', 'seng', 'sheng', 'teng', 'weng', 'zeng', 'zheng', 'ng'],
     ['bi', 'di', 'ji', 'ju', 'li', 'lü', 'mi', 'ni', 'nü', 'pi', 'qi', 'qu', 'ti', 'xi', 'xu', 'yi', 'yu'],
@@ -39,10 +39,10 @@ SyllableClusters = dict(
 )
 
 ToneJar = {
-    'a': 'aāáǎà', 'o': 'oōóǒò', 'e': 'eēéěè', 'i': 'iīíǐì', 'u': 'uūúǔù', 'ü': 'üǖǘǚǜ',
+    'a': 'aāáǎà', 'o': 'oōóǒò', 'e': 'eēéěè', 'i': 'iīíǐì', 'u': 'uūúǔù', 'ü': 'üǖǘǚǜ', 'n': 'nńňǹ'
 }
-
-ToneList = ['āōēīūǖ', 'áóéíúǘ', 'ǎǒěǐǔǚ', 'àòèìùǜ']
+# , 'n': 'nn̄ňǹ'
+ToneList = ['āōēīūǖ', 'áóéíúǘń', 'ǎǒěǐǔǚň', 'àòèìùǜǹ']
 
 
 @E.register()
@@ -83,6 +83,7 @@ class PhraseService:
 
     @staticmethod
     def number_toner(syllable: str, tone: Optional[int]) -> str:
+        tone = tone or 0
         return syllable + str(tone)
 
     @staticmethod

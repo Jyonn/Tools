@@ -5,6 +5,7 @@ import sys
 
 import django
 import pypinyin
+from tqdm import tqdm
 
 sys.path.extend(['../..'])
 
@@ -38,14 +39,17 @@ class PhraseLoader:
 
     @staticmethod
     def set_number_py():
-        phrases = Phrase.objects.filter(number_py='')
-        for phrase in phrases:
+        phrases = Phrase.objects.all()[71120+281460:]
+        for phrase in tqdm(phrases):
             pys = json.loads(phrase.py)
-            for index, py in enumerate(pys):
-                pys[index] = phraseService.format_syllable(py, printer='number_toner')
-            pys = json.dumps(pys, ensure_ascii=False)
-            phrase.number_py = pys
-            phrase.save()
+            try:
+                for index, py in enumerate(pys):
+                    pys[index] = phraseService.format_syllable(py, printer='number_toner')
+                pys = json.dumps(pys, ensure_ascii=False)
+                phrase.number_py = pys
+                phrase.save()
+            except Exception:
+                pass
 
 
 PhraseLoader.set_number_py()
