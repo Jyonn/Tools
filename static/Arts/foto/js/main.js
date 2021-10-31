@@ -3,8 +3,8 @@ class FotoPage {
         this.albums = []
         this.fotos = []
         this.fotos = []
-        // this.base_url = 'https://tools.6-79.cn/dev/api/arts/foto'
-        this.base_url = 'http://localhost:8000/dev/api/arts/foto'
+        this.base_url = 'https://tools.6-79.cn/dev/api/arts/foto'
+        // this.base_url = 'http://localhost:8000/dev/api/arts/foto'
 
         this.currentAlbum = null
         this.albumBox = getByClass('album-box')
@@ -20,6 +20,11 @@ class FotoPage {
         this.uploadFileList = []
 
         Request.setHandler(this.requestHandler.bind(this))
+
+        this.space = getQueryParam('space')
+        if (!this.space) {
+            alert('Please specify space')
+        }
     }
 
     getToken() {

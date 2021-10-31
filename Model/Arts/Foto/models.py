@@ -46,6 +46,15 @@ class Space(models.Model):
         except cls.DoesNotExist as err:
             raise FotoError.SPACE_NOT_FOUND(debug_message=err)
 
+    def d(self):
+        albums = self.album_set.dict(Album.d)
+        fotos = Foto.get_pinned_fotos(space=self).dict(Foto.d)
+
+        return dict(
+            albums=albums,
+            fotos=fotos,
+        )
+
 
 class Album(models.Model):
     class Meta:
@@ -247,8 +256,8 @@ class Foto(models.Model):
         self.delete()
 
     @classmethod
-    def get_pinned_fotos(cls):
-        return cls.objects.filter(pinned=True)
+    def get_pinned_fotos(cls, space):
+        return cls.objects.filter(pinned=True, album__space=space)
 
     def _readable_sources(self):
         return dict(

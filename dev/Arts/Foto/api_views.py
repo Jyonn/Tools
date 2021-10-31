@@ -69,14 +69,9 @@ class TokenView(View):
 
 class HomeView(View):
     @staticmethod
-    def get(_):
-        albums = Album.objects.dict(Album.d)
-        fotos = Foto.get_pinned_fotos().dict(Foto.d)
-
-        return dict(
-            albums=albums,
-            fotos=fotos,
-        )
+    @Analyse.r(a=[SpaceP.name_getter])
+    def get(r):
+        return r.d.space.d()
 
 
 class FotoView(View):
