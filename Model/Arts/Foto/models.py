@@ -2,6 +2,7 @@ import datetime
 
 from SmartDjango import models, E
 from django.utils.crypto import get_random_string
+from smartify import P
 
 from dev.Arts.Foto.base import qn_manager, policy
 
@@ -13,11 +14,13 @@ class FotoError:
     AS_COVER = E("相册封面无法删除")
 
     ALBUM_CREATE = E("新增相册失败")
-    FOTO_ALBUM_CREATE = E("相册绑定失败")
     ALBUM_NOT_FOUND = E("相册不存在")
 
+    SPACE_CREATE = E("新增空间失败")
+    SPACE_NOT_FOUND = E("空间不存在")
 
-class Album(models.Model):
+
+class Space(models.Model):
     name = models.CharField(
         max_length=20,
         min_length=1,
@@ -34,14 +37,61 @@ class Album(models.Model):
         try:
             return cls.objects.create(name=name)
         except Exception as err:
-            raise FotoError.ALBUM_CREATE(debug_message=err)
+            raise FotoError.SPACE_CREATE(debug_message=err)
 
     @classmethod
     def get_by_name(cls, name):
         try:
             return cls.objects.get(name=name)
         except cls.DoesNotExist as err:
+            raise FotoError.SPACE_NOT_FOUND(debug_message=err)
+
+
+class Album(models.Model):
+    class Meta:
+        unique_together = ('name', 'space')
+
+    name = models.CharField(
+        max_length=20,
+        min_length=1,
+    )
+
+    space = models.ForeignKey(
+        Space,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        default=None,
+    )
+
+    @classmethod
+    def create(cls, name, space):
+        try:
+            return cls.get_by_name(name, space)
+        except Exception:
+            pass
+
+        try:
+            return cls.objects.create(name=name, space=space)
+        except Exception as err:
+            raise FotoError.ALBUM_CREATE(debug_message=err)
+
+    @classmethod
+    def get_by_name(cls, name, space):
+        try:
+            return cls.objects.get(name=name, space=space)
+        except cls.DoesNotExist as err:
             raise FotoError.ALBUM_NOT_FOUND(debug_message=err)
+
+    @classmethod
+    def getter(cls, value):
+        value['album'] = cls.get_by_name(name=value['album'], space=value['space'])
+        return value
+
+    @classmethod
+    def creator(cls, value):
+        value['album'] = cls.create(name=value['album'], space=value['space'])
+        return value
 
     def _readable_fotos(self):
         return self.foto_set.dict(Foto.d)
@@ -231,10 +281,13 @@ class Foto(models.Model):
         )
 
 
+class SpaceP:
+    name = Space.get_param('name').rename('space')
+    name_getter = name.clone().process(Space.get_by_name)
+
+
 class AlbumP:
-    name = Album.get_param('name')
-    name_getter = name.clone().rename('album').process(Album.get_by_name)
-    name_creator = name.clone().rename('album').process(Album.create)
+    name = Album.get_param('name').rename('album')
 
 
 class FotoP:

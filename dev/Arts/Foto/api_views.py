@@ -1,8 +1,8 @@
 from SmartDjango import Analyse
 from django.views import View
-from smartify import P
+from smartify import P, PDict
 
-from Model.Arts.Foto.models import Foto, AlbumP, Album, FotoP
+from Model.Arts.Foto.models import Foto, AlbumP, Album, FotoP, SpaceP
 from dev.Arts.Foto.auth import Auth
 from dev.Arts.Foto.base import qn_manager, boundary
 
@@ -11,15 +11,15 @@ class CallbackView(View):
     """/dev/Arts/Foto/callback"""
 
     @staticmethod
-    @Analyse.r(b=[
+    @Analyse.r(b=PDict().set_fields(
         'key',
         'mime_type',
         'color_average',
         'image_info',
-        AlbumP.name_getter,
-    ])
+        AlbumP.name,
+        SpaceP.name_getter).process(Album.getter)
+    )
     def post(r):
-        print(r.d.dict())
         qn_manager.auth_callback(r)
 
         color_average = r.d.color_average['RGB']  # type: str
@@ -49,7 +49,11 @@ class CallbackView(View):
 class TokenView(View):
     @staticmethod
     @Analyse.r(
-        q=[AlbumP.name_creator, P('image_num', '图片数量').process(boundary(max_=99, min_=1))]
+        q=PDict().set_fields(
+            SpaceP.name_getter,
+            AlbumP.name,
+            P('image_num', '图片数量').process(boundary(max_=99, min_=1))
+        ).process(Album.getter)
     )
     @Auth.require_admin
     def get(r):
@@ -59,6 +63,7 @@ class TokenView(View):
         return Foto.get_tokens(
             num=image_num,
             album=album.name,
+            space=album.space.name,
         )
 
 
@@ -107,7 +112,10 @@ class FotoView(View):
 class AlbumView(View):
     @staticmethod
     @Analyse.r(
-        a=[AlbumP.name_getter]
+        a=PDict().set_fields(
+            SpaceP.name_getter,
+            AlbumP.name,
+        ).process(Album.getter)
     )
     def get(r):
         album = r.d.album
@@ -115,7 +123,10 @@ class AlbumView(View):
 
     @staticmethod
     @Analyse.r(
-        a=[AlbumP.name_creator]
+        a=PDict().set_fields(
+            SpaceP.name_getter,
+            AlbumP.name,
+        ).process(Album.creator)
     )
     @Auth.require_admin
     def post(_):
@@ -123,7 +134,10 @@ class AlbumView(View):
 
     @staticmethod
     @Analyse.r(
-        a=[AlbumP.name_creator],
+        a=PDict().set_fields(
+            SpaceP.name_getter,
+            AlbumP.name,
+        ).process(Album.getter),
         b=[AlbumP.name]
     )
     @Auth.require_admin
@@ -134,7 +148,10 @@ class AlbumView(View):
 
     @staticmethod
     @Analyse.r(
-        a=[AlbumP.name_getter]
+        a=PDict().set_fields(
+            SpaceP.name_getter,
+            AlbumP.name,
+        ).process(Album.getter)
     )
     @Auth.require_admin
     def delete(r):

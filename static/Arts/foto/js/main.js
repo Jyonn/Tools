@@ -3,6 +3,8 @@ class FotoPage {
         this.albums = []
         this.fotos = []
         this.fotos = []
+        // this.base_url = 'https://tools.6-79.cn/dev/api/arts/foto'
+        this.base_url = 'http://localhost:8000/dev/api/arts/foto'
 
         this.currentAlbum = null
         this.albumBox = getByClass('album-box')
@@ -134,7 +136,7 @@ class FotoPage {
 
     clickFoto(foto_id) {
         if (this.removeActive) {
-            Request.delete('https://tools.6-79.cn/dev/api/arts/foto/' + foto_id).then(_ => {
+            Request.delete(this.base_url + foto_id).then(_ => {
                 this.fetchAlbum(this.currentAlbum)
             })
         } else if (this.pinActive) {
@@ -145,7 +147,7 @@ class FotoPage {
     fetchHomePage() {
         this.currentAlbum = null
 
-        Request.get('https://tools.6-79.cn/dev/api/arts/foto/')
+        Request.get(this.base_url)
             .then(data => {
                 this.albums = []
                 data.albums.forEach(album => this.albums.push(album.name))
@@ -160,7 +162,7 @@ class FotoPage {
         this.currentAlbum = album
 
         this.initAlbumBox()
-        Request.get('https://tools.6-79.cn/dev/api/arts/foto/album/' + album)
+        Request.get(this.base_url + '/album/' + album)
             .then(data => {
                 this.fotos = data.fotos
                 this.showUploadBox()
@@ -170,7 +172,7 @@ class FotoPage {
 
     fetchUploadTokens() {
         let count = this.uploadFileList.length
-        Request.get('https://tools.6-79.cn/dev/api/arts/foto/token', {
+        Request.get(this.base_url + '/token', {
             image_num: count,
             album: this.currentAlbum
         }).then(data => {
@@ -200,7 +202,7 @@ class FotoPage {
             return
         }
 
-        Request.post('https://tools.6-79.cn/dev/api/arts/foto/album/' + album)
+        Request.post(this.base_url + '/album/' + album)
             .then(_ => {
                 this.fetchHomePage()
             })
@@ -219,7 +221,7 @@ class FotoPage {
 
     destroyAlbum() {
         if (confirm('Confirm Destroy Album?')) {
-            Request.delete('https://tools.6-79.cn/dev/api/arts/foto/album/' + this.currentAlbum)
+            Request.delete(this.base_url + '/album/' + this.currentAlbum)
                 .then(_ => {
                     this.fetchHomePage()
                 })

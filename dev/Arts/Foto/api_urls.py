@@ -7,5 +7,5 @@ urlpatterns = [
     path('token', views.TokenView.as_view()),
     path('<str:foto>', views.FotoView.as_view()),
     path('', views.HomeView.as_view()),
-    path('album/<str:album>', views.AlbumView.as_view()),
+    path('space/<str:space>/album/<str:album>', views.AlbumView.as_view()),
 ]
