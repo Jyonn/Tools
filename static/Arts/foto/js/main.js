@@ -46,7 +46,7 @@ class FotoPage {
         this.removeActive = true
         activate(this.removeButton)
         this.fotoBox.classList.add('remove-mode')
-        this.deactivatePinMode()
+        // this.deactivatePinMode()
     }
 
     deactivateRemoveMode() {
@@ -55,18 +55,18 @@ class FotoPage {
         this.fotoBox.classList.remove('remove-mode')
     }
 
-    activatePinMode() {
-        this.pinActive = true
-        activate(this.pinButton)
-        this.fotoBox.classList.add('pin-mode')
-        this.deactivateRemoveMode()
-    }
+    // activatePinMode() {
+    //     this.pinActive = true
+    //     activate(this.pinButton)
+    //     this.fotoBox.classList.add('pin-mode')
+    //     this.deactivateRemoveMode()
+    // }
 
-    deactivatePinMode() {
-        this.pinActive = false
-        deactivate(this.pinButton)
-        this.fotoBox.classList.remove('pin-mode')
-    }
+    // deactivatePinMode() {
+    //     this.pinActive = false
+    //     deactivate(this.pinButton)
+    //     this.fotoBox.classList.remove('pin-mode')
+    // }
 
     toggleRemoveMode() {
         if (this.removeActive) {
@@ -76,13 +76,13 @@ class FotoPage {
         }
     }
 
-    togglePinMode() {
-        if (this.pinActive) {
-            this.deactivatePinMode()
-        } else {
-            this.activatePinMode()
-        }
-    }
+    // togglePinMode() {
+    //     if (this.pinActive) {
+    //         this.deactivatePinMode()
+    //     } else {
+    //         this.activatePinMode()
+    //     }
+    // }
 
     showUploadBox() {
         activate(this.fotoBox)
@@ -141,7 +141,7 @@ class FotoPage {
 
     clickFoto(foto_id) {
         if (this.removeActive) {
-            Request.delete(this.base_url + foto_id).then(_ => {
+            Request.delete(this.base_url + '/' + foto_id).then(_ => {
                 this.fetchAlbum(this.currentAlbum)
             })
         } else if (this.pinActive) {
@@ -167,7 +167,7 @@ class FotoPage {
         this.currentAlbum = album
 
         this.initAlbumBox()
-        Request.get(this.base_url + '/album/' + album)
+        Request.get(this.base_url + '/album', {album: album, space: this.space})
             .then(data => {
                 this.fotos = data.fotos
                 this.showUploadBox()
@@ -179,7 +179,8 @@ class FotoPage {
         let count = this.uploadFileList.length
         Request.get(this.base_url + '/token', {
             image_num: count,
-            album: this.currentAlbum
+            album: this.currentAlbum,
+            space: this.space,
         }).then(data => {
             for (let i = 0; i < data.length; i++) {
                 if (this.uploadFileList[i].uploaded) {
@@ -207,7 +208,7 @@ class FotoPage {
             return
         }
 
-        Request.post(this.base_url + '/album/' + album)
+        Request.post(this.base_url + '/album', {album: album, space: this.space})
             .then(_ => {
                 this.fetchHomePage()
             })
@@ -226,7 +227,7 @@ class FotoPage {
 
     destroyAlbum() {
         if (confirm('Confirm Destroy Album?')) {
-            Request.delete(this.base_url + '/album/' + this.currentAlbum)
+            Request.delete(this.base_url + '/album', {album: this.currentAlbum, space: this.space})
                 .then(_ => {
                     this.fetchHomePage()
                 })

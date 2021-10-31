@@ -118,7 +118,7 @@ class AlbumView(View):
 
     @staticmethod
     @Analyse.r(
-        q=PDict().set_fields(
+        b=PDict().set_fields(
             SpaceP.name_getter,
             AlbumP.name,
         ).process(Album.creator)
