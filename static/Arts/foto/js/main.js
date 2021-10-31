@@ -152,7 +152,7 @@ class FotoPage {
     fetchHomePage() {
         this.currentAlbum = null
 
-        Request.get(this.base_url)
+        Request.get(this.base_url, {space: this.space})
             .then(data => {
                 this.albums = []
                 data.albums.forEach(album => this.albums.push(album.name))

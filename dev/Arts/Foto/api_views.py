@@ -69,7 +69,7 @@ class TokenView(View):
 
 class HomeView(View):
     @staticmethod
-    @Analyse.r(a=[SpaceP.name_getter])
+    @Analyse.r(q=[SpaceP.name_getter])
     def get(r):
         return r.d.space.d()
 
@@ -107,7 +107,7 @@ class FotoView(View):
 class AlbumView(View):
     @staticmethod
     @Analyse.r(
-        a=PDict().set_fields(
+        q=PDict().set_fields(
             SpaceP.name_getter,
             AlbumP.name,
         ).process(Album.getter)
@@ -118,7 +118,7 @@ class AlbumView(View):
 
     @staticmethod
     @Analyse.r(
-        a=PDict().set_fields(
+        q=PDict().set_fields(
             SpaceP.name_getter,
             AlbumP.name,
         ).process(Album.creator)
@@ -129,7 +129,7 @@ class AlbumView(View):
 
     @staticmethod
     @Analyse.r(
-        a=PDict().set_fields(
+        q=PDict().set_fields(
             SpaceP.name_getter,
             AlbumP.name,
         ).process(Album.getter),
@@ -143,7 +143,7 @@ class AlbumView(View):
 
     @staticmethod
     @Analyse.r(
-        a=PDict().set_fields(
+        q=PDict().set_fields(
             SpaceP.name_getter,
             AlbumP.name,
         ).process(Album.getter)
