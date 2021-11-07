@@ -280,7 +280,8 @@ class Foto(models.Model):
             'height',
             'foto_id',
             'orientation',
-            'album'
+            'album',
+            'pinned'
         )
 
     def d_base(self):

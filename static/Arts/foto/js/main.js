@@ -2,7 +2,6 @@ class FotoPage {
     constructor() {
         this.albums = []
         this.fotos = []
-        this.fotos = []
         this.base_url = 'https://tools.6-79.cn/dev/api/arts/foto'
         // this.base_url = 'http://localhost:8000/dev/api/arts/foto'
 
@@ -46,7 +45,7 @@ class FotoPage {
         this.removeActive = true
         activate(this.removeButton)
         this.fotoBox.classList.add('remove-mode')
-        // this.deactivatePinMode()
+        this.deactivatePinMode()
     }
 
     deactivateRemoveMode() {
@@ -55,18 +54,18 @@ class FotoPage {
         this.fotoBox.classList.remove('remove-mode')
     }
 
-    // activatePinMode() {
-    //     this.pinActive = true
-    //     activate(this.pinButton)
-    //     this.fotoBox.classList.add('pin-mode')
-    //     this.deactivateRemoveMode()
-    // }
+    activatePinMode() {
+        this.pinActive = true
+        activate(this.pinButton)
+        this.fotoBox.classList.add('pin-mode')
+        this.deactivateRemoveMode()
+    }
 
-    // deactivatePinMode() {
-    //     this.pinActive = false
-    //     deactivate(this.pinButton)
-    //     this.fotoBox.classList.remove('pin-mode')
-    // }
+    deactivatePinMode() {
+        this.pinActive = false
+        deactivate(this.pinButton)
+        this.fotoBox.classList.remove('pin-mode')
+    }
 
     toggleRemoveMode() {
         if (this.removeActive) {
@@ -76,13 +75,13 @@ class FotoPage {
         }
     }
 
-    // togglePinMode() {
-    //     if (this.pinActive) {
-    //         this.deactivatePinMode()
-    //     } else {
-    //         this.activatePinMode()
-    //     }
-    // }
+    togglePinMode() {
+        if (this.pinActive) {
+            this.deactivatePinMode()
+        } else {
+            this.activatePinMode()
+        }
+    }
 
     showUploadBox() {
         activate(this.fotoBox)
@@ -129,7 +128,7 @@ class FotoPage {
             let url = window.URL.createObjectURL(file)
             if (uploaded) {
                 this.fotoBox.appendChild(stringToHtml(fotoUploadedTemplate(url)))
-            } else {
+            } else {togglePinMode
                 this.fotoBox.appendChild(stringToHtml(fotoUploadingTemplate(url, i)))
             }
         }
@@ -222,6 +221,16 @@ class FotoPage {
     confirmUploadFiles() {
         if (confirm('Confirm Upload?')) {
             this.fetchUploadTokens()
+        }
+    }
+
+    renameAlbum() {
+        let name = prompt('New Album Name', this.currentAlbum)
+        if (name) {
+            Request.put(this.base_url + '/album?album=' + this.currentAlbum + '&space=' + this.space, {name})
+                .then(_ => {
+                    this.fetchHomePage()
+                })
         }
     }
 

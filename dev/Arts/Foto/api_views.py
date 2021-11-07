@@ -133,7 +133,7 @@ class AlbumView(View):
             SpaceP.name_getter,
             AlbumP.name,
         ).process(Album.getter),
-        b=[AlbumP.name]
+        b=[AlbumP.name.clone().rename('name')]
     )
     @Auth.require_admin
     def put(r):

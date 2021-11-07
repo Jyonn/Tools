@@ -108,6 +108,14 @@
     cursor: pointer;
 }
 
+.button-box .button.warn {
+    color: #B75A5A;
+}
+
+.button-box .button.margin-top {
+    margin-top: 100px;
+}
+
 .button-box .button:hover {
     background: #B75A5A;
 }
