@@ -74,6 +74,25 @@
 
 .foto-box.remove-mode .foto:hover {
     border: 5px solid #5A5AB7;
+    cursor: pointer;
+}
+
+.foto-box.pin-mode .foto.foto-pinned:hover {
+    border: 5px solid black;
+    cursor: pointer;
+}
+
+.foto-box.pin-mode .foto:hover {
+    border: 5px solid #BB3;
+    cursor: pointer;
+}
+
+.foto-box.pin-mode .foto.foto-pinned {
+    border: 5px solid #BB3;
+}
+
+.foto-box.pin-mode .foto {
+    border: 5px solid black;
 }
 
 .file-input {
@@ -93,10 +112,11 @@
     right: 0;
     width: 150px;
     height: calc(100% - 50px);
+    display: none;
 }
 
-.button-box.inactive {
-    display: none;
+.button-box.active {
+    display: block;
 }
 
 .button-box .button {
@@ -110,6 +130,7 @@
 
 .button-box .button.warn {
     color: #B75A5A;
+    font-weight: bold;
 }
 
 .button-box .button.margin-top {
@@ -118,6 +139,10 @@
 
 .button-box .button:hover {
     background: #B75A5A;
+}
+
+.button-box .button.warn:hover {
+    background: white;
 }
 
 .button-box .button.active {

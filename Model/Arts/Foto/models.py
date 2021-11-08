@@ -244,11 +244,21 @@ class Foto(models.Model):
         return qn_manager.get_image(
             self.key, expires=expires, auto_rotate=auto_rotate, resize=resize, quality=quality)
 
+    def resize(self):
+        target = 1200
+        if self.width <= target and self.height <= target:
+            return self.width, self.height
+
+        if self.width > self.height:
+            return target, target * self.height // self.width
+
+        return target * self.width // self.height, target
+
     def get_sources(self):
         return dict(
             origin=self.get_source(auto_rotate=False, resize=None),
             square=self.get_source(auto_rotate=True, resize=(600, 600), quality=75),
-            rotate=self.get_source(auto_rotate=True, resize=None)
+            rotate=self.get_source(auto_rotate=True, resize=self.resize(), quality=75)
         )
 
     def remove(self):

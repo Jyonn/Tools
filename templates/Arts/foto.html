@@ -21,10 +21,10 @@
         <div class="button" onclick="fotoPage.clearUploadFiles()">Clear</div>
         <div id="remove" class="button" onclick="fotoPage.toggleRemoveMode()">Remove</div>
         <div class="button" onclick="fotoPage.confirmUploadFiles()">Upload</div>
-        <div class="button" onclick="fotoPage.togglePinMode()">Pin</div>
+        <div id="pin" class="button" onclick="fotoPage.togglePinMode()">Pin</div>
 
         <div class="button margin-top" onclick="fotoPage.renameAlbum()">Rename</div>
-        <div class="button" onclick="fotoPage.destroyAlbum()">Destroy</div>
+        <div class="button warn" onclick="fotoPage.destroyAlbum()">Destroy</div>
     </div>
 
     <input class="file-input" type="file" multiple accept="image/*"/>

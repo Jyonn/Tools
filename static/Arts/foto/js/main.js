@@ -117,7 +117,7 @@ class FotoPage {
     }
 
     initFotoBox() {
-        let fotoTemplate = template`<div class="foto img-fit" style="background-image: url('${0}')" onclick="fotoPage.clickFoto('${1}')"></div>`
+        let fotoTemplate = template`<div class="foto img-fit ${2}" style="background-image: url('${0}')" onclick="fotoPage.clickFoto(this, '${1}')"></div>`
         let fotoUploadingTemplate = template`<div class="foto img-fit uploading" style="background-image: url('${0}')" onclick="fotoPage.removeUploading(${1})"></div>`
         let fotoUploadedTemplate = template`<div class="foto img-fit uploaded" style="background-image: url('${0}')"></div>`
         this.fotoBox.innerHTML = ''
@@ -133,23 +133,38 @@ class FotoPage {
             }
         }
 
+        let index = 0
         for (let foto of this.fotos) {
-            this.fotoBox.appendChild(stringToHtml(fotoTemplate(foto.sources.square, foto.foto_id)))
+            this.fotoBox.appendChild(stringToHtml(fotoTemplate(foto.sources.square, index, foto.pinned ? 'foto-pinned' : '')))
+            index += 1
         }
     }
 
-    clickFoto(foto_id) {
+    clickFoto(ele, index) {
+        let foto = this.fotos[index]
+        let foto_id = foto.foto_id
+
         if (this.removeActive) {
             Request.delete(this.base_url + '/' + foto_id).then(_ => {
                 this.fetchAlbum(this.currentAlbum)
             })
         } else if (this.pinActive) {
-
+            Request.put(this.base_url + '/' + foto_id).then(_ => {
+                foto.pinned = !foto.pinned
+                if (foto.pinned) {
+                    ele.classList.add('foto-pinned')
+                } else {
+                    ele.classList.remove('foto-pinned')
+                }
+                this.initFotoBox()
+            })
         }
     }
 
     fetchHomePage() {
         this.currentAlbum = null
+        this.deactivatePinMode()
+        this.deactivateRemoveMode()
 
         Request.get(this.base_url, {space: this.space})
             .then(data => {
@@ -192,11 +207,21 @@ class FotoPage {
                 fd.append('token', token)
                 fd.append('file', file)
 
+                let index = 0
+
                 Request.post('https://up.qiniup.com/', fd, false, false)
                     .then(_ => {
                         this.uploadFileList[i].uploaded = true
                         this.initFotoBox()
+                        index += 1
                     })
+
+                let interval = setInterval(() => {
+                    if (index === this.uploadFileList.length) {
+                        this.clearUploadFiles()
+                        clearInterval(interval)
+                    }
+                }, 500)
             }
         })
     }
