@@ -243,7 +243,6 @@ class Foto(models.Model):
     def get_source(self, expires=3600, auto_rotate=True, resize=None, quality=100):
         url = qn_manager.get_image(
             self.key, expires=expires, auto_rotate=auto_rotate, resize=resize, quality=quality)
-        print(url)
         return url
 
     def resize(self):
@@ -257,7 +256,6 @@ class Foto(models.Model):
         return target * self.width // self.height, target
 
     def get_sources(self):
-        print(self.resize())
         return dict(
             origin=self.get_source(auto_rotate=False, resize=None),
             square=self.get_source(auto_rotate=True, resize=(600, 600), quality=75),
@@ -275,9 +273,9 @@ class Foto(models.Model):
     def _readable_sources(self):
         return dict(
             color=self.color_average,
-            rotate=self.get_source(auto_rotate=True, resize=None),
             origin=self.get_source(auto_rotate=False, resize=None),
-            square=self.get_source(auto_rotate=True, resize=(600, 600)),
+            square=self.get_source(auto_rotate=True, resize=(600, 600), quality=75),
+            rotate=self.get_source(auto_rotate=True, resize=self.resize(), quality=75)
         )
 
     def _readable_orientation(self):
