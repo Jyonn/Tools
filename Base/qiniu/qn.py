@@ -89,6 +89,12 @@ class QnManager:
         else:
             return self.auth.private_download_url(url, expires=expires)
 
+    def get_image_exif(self, key, expires=3600):
+        url = '%s/%s?exif' % (self.cdn_host, key)
+        if self.public:
+            return url
+        return self.auth.private_download_url(url, expires=expires)
+
     @classmethod
     def deal_manage_res(cls, target, access_token):
         url = '%s%s' % (cls.QINIU_MANAGE_HOST, target)

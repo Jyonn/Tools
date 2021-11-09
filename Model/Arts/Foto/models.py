@@ -245,6 +245,9 @@ class Foto(models.Model):
             self.key, expires=expires, auto_rotate=auto_rotate, resize=resize, quality=quality)
         return url
 
+    def get_exif(self, expires=3600):
+        return qn_manager.get_image_exif(self.key, expires=expires)
+
     def resize(self):
         target = 1200
         if self.width <= target and self.height <= target:
@@ -275,7 +278,8 @@ class Foto(models.Model):
             color=self.color_average,
             origin=self.get_source(auto_rotate=False, resize=None),
             square=self.get_source(auto_rotate=True, resize=(600, 600), quality=75),
-            rotate=self.get_source(auto_rotate=True, resize=self.resize(), quality=75)
+            rotate=self.get_source(auto_rotate=True, resize=self.resize(), quality=75),
+            exif=self.get_exif(),
         )
 
     def _readable_orientation(self):
