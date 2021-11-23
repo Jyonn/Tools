@@ -240,7 +240,7 @@ class FotoPage {
 
     clearUploadFiles() {
         this.uploadFileList = []
-        this.initFotoBox()
+        this.fetchAlbum(this.currentAlbum)
     }
 
     confirmUploadFiles() {
