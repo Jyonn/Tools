@@ -128,7 +128,7 @@ class FotoPage {
             let url = window.URL.createObjectURL(file)
             if (uploaded) {
                 this.fotoBox.appendChild(stringToHtml(fotoUploadedTemplate(url)))
-            } else {togglePinMode
+            } else {
                 this.fotoBox.appendChild(stringToHtml(fotoUploadingTemplate(url, i)))
             }
         }
