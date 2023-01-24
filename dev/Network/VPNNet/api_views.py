@@ -25,7 +25,7 @@ class UpdateView(views.View):
         if now_ts - last_check < CHECK_INTERVAL:
             return VPNNetError.INTERVAL_NOT_REACHED
 
-        Config.update_value(CI.VPNNET_LAST_CHECK, now_ts)
+        Config.update_value(CI.VPNNET_LAST_CHECK, str(now_ts))
 
         # use requests to log in, with form data
         session = requests.Session()
