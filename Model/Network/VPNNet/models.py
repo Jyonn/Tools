@@ -56,13 +56,14 @@ class Record(models.Model):
             raise e
 
     @classmethod
-    def update(cls, date, rate, upload, download):
+    def update(cls, date: datetime.date, rate, upload, download):
         record = cls.get_or_create(date, rate)
         record.upload = upload
         record.download = download
         record.save()
 
-        Session.insert(record)
+        if date == datetime.date.today():
+            Session.insert(record)
 
     def d(self):
         return self.dictify('date', 'rate', 'upload', 'download')
