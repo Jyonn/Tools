@@ -4,7 +4,7 @@ from SmartDjango import models, E
 
 
 @E.register()
-class VPNNetError:
+class RecordError:
     RECORD_NOT_FOUND = E('找不到记录')
 
 
