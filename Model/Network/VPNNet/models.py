@@ -58,11 +58,12 @@ class Record(models.Model):
     @classmethod
     def update(cls, date: datetime.date, rate, upload, download):
         record = cls.get_or_create(date, rate)
+        updated = record.upload != upload or record.download != download
         record.upload = upload
         record.download = download
         record.save()
 
-        if date == datetime.date.today():
+        if updated and date == datetime.date.today():
             Session.insert(record)
 
     def d(self):
