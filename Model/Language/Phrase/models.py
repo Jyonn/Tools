@@ -13,7 +13,7 @@ import pypinyin
 from SmartDjango import models, E
 
 
-@E.register()
+@E.register(id_processor=E.idp_cls_prefix())
 class PhraseError:
     SETMEMBER_CONFLICT = E("组内集合元素[{0}]重复")
     GET_GROUPSETMEMBER = E("获取组内集合元素[{0}]失败")

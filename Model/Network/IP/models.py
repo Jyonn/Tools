@@ -3,7 +3,7 @@ from SmartDjango import models, E
 from Base.operation import O
 
 
-@E.register()
+@E.register(id_processor=E.idp_cls_prefix())
 class IPError:
     IP_NOT_FOUND = E("找不到IP[{0}]")
     CREATE_IP = E("增加IP[{0}]失败")

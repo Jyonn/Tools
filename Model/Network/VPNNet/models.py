@@ -3,9 +3,12 @@ import datetime
 from SmartDjango import models, E
 
 
-@E.register()
-class RecordError:
+@E.register(id_processor=E.idp_cls_prefix())
+class VPNNetError:
     RECORD_NOT_FOUND = E('找不到记录')
+    INTERVAL_NOT_REACHED = E('间隔未到')
+    LOGIN_FAILED = E('登录失败')
+    LOG_FAILED = E('获取日志失败')
 
 
 class Record(models.Model):
@@ -36,7 +39,7 @@ class Record(models.Model):
         try:
             return cls.objects.get(date=date, rate=rate)
         except cls.DoesNotExist:
-            raise RecordError.RECORD_NOT_FOUND
+            raise VPNNetError.RECORD_NOT_FOUND
 
     @classmethod
     def create(cls, date, rate):
@@ -46,7 +49,7 @@ class Record(models.Model):
     def get_or_create(cls, date, rate):
         try:
             return cls.get(date, rate)
-        except RecordError.RECORD_NOT_FOUND:
+        except VPNNetError.RECORD_NOT_FOUND:
             return cls.create(date, rate)
 
     @classmethod

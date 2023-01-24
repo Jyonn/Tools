@@ -5,15 +5,8 @@ from SmartDjango import E
 from django import views
 
 from Model.Base.Config.models import Config, CI
-from Model.Network.VPNNet.models import Record
+from Model.Network.VPNNet.models import Record, VPNNetError
 from dev.Network.VPNNet.base import CHECK_INTERVAL, LOGIN_URL, EMAIL, PASSWORD, LOG_URL
-
-
-@E.register()
-class VPNNetError:
-    INTERVAL_NOT_REACHED = E('间隔未到')
-    LOGIN_FAILED = E('登录失败')
-    LOG_FAILED = E('获取日志失败')
 
 
 class UpdateView(views.View):
