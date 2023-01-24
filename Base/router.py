@@ -23,19 +23,19 @@ class RouteHandler(BaseHandler):
 class Router:
     def __init__(self):
         self.handlers = dict()
-        self.disabled = dict()
+        self.hidden = dict()
 
-    def register(self, path: str, handler, disabled=False):
+    def register(self, path: str, handler, hidden=False):
         self.handlers[path] = handler
-        self.disabled[path] = disabled
+        self.hidden[path] = hidden
 
     def enable(self, path):
         if path in self.handlers:
-            self.disabled[path] = False
+            self.hidden[path] = False
 
     def disable(self, path):
         if path in self.handlers:
-            self.disabled[path] = True
+            self.hidden[path] = True
 
     def register_param(self, path: str, handler):
         self.handlers['param:' + path] = handler
@@ -70,13 +70,13 @@ class Router:
     def available_handlers(self):
         handlers = {}
         for path in self.handlers:
-            if not self.disabled[path]:
+            if not self.hidden[path]:
                 handlers[path] = self.handlers[path]
         return handlers
 
     @staticmethod
     def authorized(r: HttpRequest):
-        print(r.META)
+        # print(r.META)
         return r.META.get('HTTP_TOKEN') == Config.get_value_by_key('StaticToken')
 
     def route(self, r: HttpRequest, path: str):
@@ -95,7 +95,7 @@ class Router:
             if sub_path is not None and isinstance(handler.SUB_ROUTER, Router):
                 return handler.SUB_ROUTER.route(r, sub_path)
             if r.method == 'POST':
-                if self.disabled[app_name]:
+                if self.hidden[app_name]:
                     return NetPacker.send(RouterError.DISABLED)
                 return handler.run(r)
             elif r.method == 'GET':

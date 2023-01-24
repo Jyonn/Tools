@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'Model.Base.Config',
     'Model.Network.IP',
     'Model.Arts.Foto',
+    'Model.Network.VPNNet',
 ]
 
 MIDDLEWARE = [

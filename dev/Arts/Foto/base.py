@@ -9,7 +9,7 @@ SECRET_KEY = Config.get_value_by_key(CI.FOTO_QN_SECRET_KEY)
 RES_BUCKET = Config.get_value_by_key(CI.FOTO_QN_RES_BUCKET)
 RES_CDN_HOST = Config.get_value_by_key(CI.FOTO_QN_CDN_HOST)
 ADMIN_TOKEN = Config.get_value_by_key(CI.FOTO_ADMIN_TOKEN)
-MAX_IMAGE_SIZE = int(Config.get_value_by_key(CI.FOTO_MAX_IMAGE_SIZE))
+MAX_IMAGE_SIZE = int(Config.get_value_by_key(CI.FOTO_MAX_IMAGE_SIZE) or -1)
 
 
 try:

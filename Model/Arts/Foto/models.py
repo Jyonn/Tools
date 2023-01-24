@@ -2,7 +2,6 @@ import datetime
 
 from SmartDjango import models, E
 from django.utils.crypto import get_random_string
-from smartify import P
 
 from dev.Arts.Foto.base import qn_manager, policy
 
