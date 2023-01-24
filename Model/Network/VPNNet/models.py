@@ -49,8 +49,11 @@ class Record(models.Model):
     def get_or_create(cls, date, rate):
         try:
             return cls.get(date, rate)
-        except VPNNetError.RECORD_NOT_FOUND:
+        except E as e:
+            assert e.eis(VPNNetError.RECORD_NOT_FOUND)
             return cls.create(date, rate)
+        except Exception as e:
+            raise e
 
     @classmethod
     def update(cls, date, rate, upload, download):
