@@ -36,7 +36,7 @@ class Record(models.Model):
         try:
             return cls.objects.get(date=date, rate=rate)
         except cls.DoesNotExist:
-            raise VPNNetError.RECORD_NOT_FOUND
+            raise RecordError.RECORD_NOT_FOUND
 
     @classmethod
     def create(cls, date, rate):
@@ -46,7 +46,7 @@ class Record(models.Model):
     def get_or_create(cls, date, rate):
         try:
             return cls.get(date, rate)
-        except VPNNetError.RECORD_NOT_FOUND:
+        except RecordError.RECORD_NOT_FOUND:
             return cls.create(date, rate)
 
     @classmethod
