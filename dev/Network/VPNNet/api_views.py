@@ -16,7 +16,7 @@ class DevNetVPNNetError:
 
 
 def verify_token(token):
-    token_key = 'NetVPNNetToken'
+    token_key = 'VPNNET-Token'
     if Config.get_value_by_key(token_key) != token:
         raise DevNetVPNNetError.NOT_ADMIN
 
