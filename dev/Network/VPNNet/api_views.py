@@ -10,7 +10,7 @@ from Model.Network.VPNNet.models import Record, VPNNetError, Session
 from dev.Network.VPNNet.base import CHECK_INTERVAL, LOGIN_URL, EMAIL, PASSWORD, LOG_URL
 
 
-@E.register()
+@E.register(id_processor=E.idp_cls_prefix())
 class DevNetVPNNetError:
     NOT_ADMIN = E('你不是管理员')
 
@@ -19,9 +19,6 @@ def verify_token(token):
     token_key = 'VPNNET-Token'
     if Config.get_value_by_key(token_key) != token:
         raise DevNetVPNNetError.NOT_ADMIN
-
-
-PM_TOKEN = P('token').process(P.Processor(verify_token, only_validate=True))
 
 
 class UpdateView(views.View):
@@ -68,6 +65,7 @@ class UpdateView(views.View):
 
 class SessionView(views.View):
     @staticmethod
-    @Analyse.r(q=[PM_TOKEN])
-    def get(_):
+    @Analyse.r(q=['token'])
+    def get(r):
+        verify_token(r.d.token)
         return Session.list_30_days()
