@@ -1,11 +1,10 @@
 import datetime
 
 import requests
-from SmartDjango import E
 from django import views
 
 from Model.Base.Config.models import Config, CI
-from Model.Network.VPNNet.models import Record, VPNNetError
+from Model.Network.VPNNet.models import Record, VPNNetError, Session
 from dev.Network.VPNNet.base import CHECK_INTERVAL, LOGIN_URL, EMAIL, PASSWORD, LOG_URL
 
 
@@ -50,11 +49,8 @@ class UpdateView(views.View):
 
         return 0
 
-#
-# from django import views
-#
-#
-# class UpdateView(views.View):
-#     @staticmethod
-#     def get(_):
-#         return 0
+
+class SessionView(views.View):
+    @staticmethod
+    def get(_):
+        return Session.list_30_days()
