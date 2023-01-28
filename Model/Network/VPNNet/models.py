@@ -172,6 +172,9 @@ class Session(models.Model):
         byte = self.end_download - self.start_download
         return self._readable_size(byte)
 
+    def _readable_date(self):
+        return self.date.strftime('%Y-%m-%d')
+
     @classmethod
     def list_30_days(cls):
         today = datetime.date.today()
@@ -180,5 +183,5 @@ class Session(models.Model):
 
     def d(self):
         return self.dictify(
-            'start', 'end', 'upload', 'download',
+            'start', 'end', 'upload', 'download', 'date'
         )
