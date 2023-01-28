@@ -1,11 +1,27 @@
 import datetime
 
 import requests
+from SmartDjango import E, Analyse
+from SmartDjango.p import P
 from django import views
 
 from Model.Base.Config.models import Config, CI
 from Model.Network.VPNNet.models import Record, VPNNetError, Session
 from dev.Network.VPNNet.base import CHECK_INTERVAL, LOGIN_URL, EMAIL, PASSWORD, LOG_URL
+
+
+@E.register()
+class DevNetVPNNetError:
+    NOT_ADMIN = E('你不是管理员')
+
+
+def verify_token(token):
+    token_key = 'NetVPNNetToken'
+    if Config.get_value_by_key(token_key) != token:
+        raise DevNetVPNNetError.NOT_ADMIN
+
+
+PM_TOKEN = P('token').process(P.Processor(verify_token, only_validate=True))
 
 
 class UpdateView(views.View):
@@ -52,5 +68,6 @@ class UpdateView(views.View):
 
 class SessionView(views.View):
     @staticmethod
+    @Analyse.r(q=[PM_TOKEN])
     def get(_):
         return Session.list_30_days()
