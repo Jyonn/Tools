@@ -179,6 +179,12 @@ class Session(models.Model):
         byte = self.end_download - self.start_download
         return self._readable_size(byte)
 
+    def _readable_start_upload(self):
+        return self._readable_size(self.start_upload)
+
+    def _readable_start_download(self):
+        return self._readable_size(self.start_download)
+
     def _readable_date(self):
         if self.record:
             return self.record.date.strftime('%Y-%m-%d')
@@ -192,5 +198,5 @@ class Session(models.Model):
 
     def d(self):
         return self.dictify(
-            'start', 'end', 'upload', 'download', 'date'
+            'start', 'end', 'upload', 'download', 'date', 'start_upload', 'start_download',
         )
