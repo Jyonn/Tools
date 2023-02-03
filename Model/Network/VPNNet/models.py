@@ -73,8 +73,13 @@ class Record(models.Model):
 class Session(models.Model):
     INTERVAL = 30 * 60
 
-    date = models.DateField(
-        verbose_name='日期',
+    record = models.ForeignKey(
+        Record,
+        on_delete=models.CASCADE,
+        verbose_name='记录',
+        default=None,
+        null=True,
+        blank=True,
     )
 
     start = models.DateTimeField(
@@ -106,26 +111,28 @@ class Session(models.Model):
     )
 
     @classmethod
-    def latest_today(cls):
+    def latest_today(cls, record):
         today = datetime.date.today()
-        return cls.objects.filter(date=today).order_by('-end').first()
+        return cls.objects.filter(date=today, record=record).order_by('-end').first()
 
     @classmethod
     def create(cls, record: Record):
         now = datetime.datetime.now()
+        upload = int(record.upload // float(record.rate))
+        download = int(record.download // float(record.rate))
         return cls.objects.create(
-            date=record.date,
+            record=record,
             start=now,
             end=now,
-            start_upload=record.upload,
-            start_download=record.download,
-            end_upload=record.upload,
-            end_download=record.download,
+            start_upload=upload,
+            start_download=download,
+            end_upload=upload,
+            end_download=download,
         )
 
     @classmethod
     def insert(cls, record: Record):
-        latest_session = cls.latest_today()
+        latest_session = cls.latest_today(record)
         if latest_session is None:
             return cls.create(record)
 
@@ -134,8 +141,8 @@ class Session(models.Model):
             return cls.create(record)
 
         latest_session.end = now
-        latest_session.end_upload = record.upload
-        latest_session.end_download = record.download
+        latest_session.end_upload = int(record.upload // float(record.rate))
+        latest_session.end_download = int(record.download // float(record.rate))
         latest_session.save()
         return latest_session
 
@@ -173,7 +180,7 @@ class Session(models.Model):
         return self._readable_size(byte)
 
     def _readable_date(self):
-        return self.date.strftime('%Y-%m-%d')
+        return self.record.date.strftime('%Y-%m-%d')
 
     @classmethod
     def list_30_days(cls):
