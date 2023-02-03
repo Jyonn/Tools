@@ -180,7 +180,9 @@ class Session(models.Model):
         return self._readable_size(byte)
 
     def _readable_date(self):
-        return self.record.date.strftime('%Y-%m-%d')
+        if self.record.date:
+            return self.record.date.strftime('%Y-%m-%d')
+        return None
 
     @classmethod
     def list_30_days(cls):
