@@ -180,7 +180,7 @@ class Session(models.Model):
         return self._readable_size(byte)
 
     def _readable_date(self):
-        if self.record.date:
+        if self.record:
             return self.record.date.strftime('%Y-%m-%d')
         return None
 
