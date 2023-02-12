@@ -1,0 +1,57 @@
+{% load static %}
+
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>服务器管理</title>
+    <link rel="stylesheet" href="{% static 'Base/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'Network/vpnnet/css/main.css' %}">
+</head>
+<body>
+{#    <div class="nav">#}
+{#        <div class="home album" onclick="fotoPage.fetchHomePage()">HomePage</div>#}
+{#        <div class="album-box"></div>#}
+{#        <div id="new-album" class="new-album album" onclick="fotoPage.newAlbum()">New Album</div>#}
+{#    </div>#}
+{##}
+{#    <div class="foto-box"></div>#}
+{#    <div class="button-box">#}
+{#        <div class="button" onclick="fotoPage.fileInput.click()">Add</div>#}
+{#        <div class="button" onclick="fotoPage.clearUploadFiles()">Clear</div>#}
+{#        <div id="remove" class="button" onclick="fotoPage.toggleRemoveMode()">Remove</div>#}
+{#        <div class="button" onclick="fotoPage.confirmUploadFiles()">Upload</div>#}
+{#        <div id="pin" class="button" onclick="fotoPage.togglePinMode()">Pin</div>#}
+{##}
+{#        <div class="button margin-top" onclick="fotoPage.renameAlbum()">Rename</div>#}
+{#        <div class="button warn" onclick="fotoPage.destroyAlbum()">Destroy</div>#}
+{#    </div>#}
+{##}
+{#    <input class="file-input" type="file" multiple accept="image/*"/>#}
+
+<div class="mask-box active" id="mask-box">
+    <input id="key" class="key" type="password">
+    <div id="verify" class="button">GO</div>
+</div>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>日期</th>
+        <th>起始时间</th>
+        <th>结束时间</th>
+        <th>起始流量</th>
+        <th>结束流量</th>
+    </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+</table>
+
+</body>
+<script src="{% static 'Base/js/common.js' %}"></script>
+<script src="{% static 'Base/js/store.js' %}"></script>
+<script src="{% static 'Base/js/request.js' %}"></script>
+<script src="{% static 'Network/vpnnet/js/main.js' %}"></script>
+<script>
+    const vpnnetPage = new VPNNetPage();
+</script>
