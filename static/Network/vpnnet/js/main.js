@@ -10,8 +10,7 @@ class VPNNetPage {
         this.load_key();
 
         this.verify.addEventListener('click', () => {
-            this.key = this.key_input.value;
-            Store.save(this.StoreKEY, key);
+            Store.save(this.StoreKEY, this.key_input.value);
             this.load_key();
         })
     }
