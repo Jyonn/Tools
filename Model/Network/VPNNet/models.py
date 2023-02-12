@@ -112,8 +112,7 @@ class Session(models.Model):
 
     @classmethod
     def latest_today(cls, record):
-        today = datetime.date.today()
-        return cls.objects.filter(date=today, record=record).order_by('-end').first()
+        return cls.objects.filter(record=record).order_by('-end').first()
 
     @classmethod
     def create(cls, record: Record):
