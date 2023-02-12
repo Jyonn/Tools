@@ -1,30 +1,35 @@
 class VPNNetPage {
+    StoreKEY = 'VPNNetKey';
     constructor() {
         this.mask_box = document.querySelector('#mask-box');
         this.tbody = document.querySelector('#tbody');
         this.verify = document.querySelector('#verify');
         this.key_input = document.querySelector('#key');
 
-        this.key = Store.load('VPNNetKey');
+        this.key = null;
+        this.load_key();
+
+        this.verify.addEventListener('click', () => {
+            this.key = this.key_input.value;
+            Store.save(this.StoreKEY, key);
+            this.load_key();
+        })
+    }
+
+    load_key() {
+        this.key = Store.load(this.StoreKEY);
+        console.log(this.key)
         if (this.key) {
-            deactivate(this.mask_box)
             this.update();
         } else {
             activate(this.mask_box)
         }
-
-        this.verify.addEventListener('click', () => {
-            let key = this.key_input.value;
-            Store.save('VPNNetKey', key);
-            deactivate(this.mask_box);
-            this.update();
-        })
     }
 
     update() {
-        Request.get('https://tools.6-79.cn/dev/api/network/vpnnet/session', {token: this.key})
+        Request.get('/dev/api/network/vpnnet/session', {token: this.key})
             .then((data) => {
-                console.log(data);
+                deactivate(this.mask_box);
                 this.tbody.innerHTML = '';
                 data.forEach((item) => {
                     let tr = document.createElement('tr');
@@ -38,5 +43,9 @@ class VPNNetPage {
                     this.tbody.appendChild(tr);
                 })
             })
+            .catch((err) => {
+                Store.remove(this.StoreKEY)
+                this.load_key();
+            });
     }
 }
