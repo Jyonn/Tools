@@ -221,7 +221,7 @@ class Session(models.Model):
     def list_30_days(cls):
         today = datetime.date.today()
         thirty_days_ago = today - datetime.timedelta(days=30)
-        return cls.objects.filter(record__date__gte=thirty_days_ago).order_by('-record__date').dict(cls.d)
+        return cls.objects.filter(record__date__gte=thirty_days_ago).order_by('-record__date', '-start').dict(cls.d)
 
     def d(self):
         return self.dictify(
