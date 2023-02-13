@@ -69,6 +69,12 @@ class Record(models.Model):
     def d(self):
         return self.dictify('date', 'rate', 'upload', 'download')
 
+    @classmethod
+    def list_30_days(cls):
+        today = datetime.date.today()
+        thirty_days_ago = today - datetime.timedelta(days=30)
+        return cls.objects.filter(date__gte=thirty_days_ago).order_by('-date').dict(cls.d)
+
 
 class Session(models.Model):
     INTERVAL = 30 * 60

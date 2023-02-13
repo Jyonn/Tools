@@ -69,3 +69,11 @@ class SessionView(views.View):
     def get(r):
         verify_token(r.d.token)
         return Session.list_30_days()
+
+
+class RecordView(views.View):
+    @staticmethod
+    @Analyse.r(q=['token'])
+    def get(r):
+        verify_token(r.d.token)
+        return Record.list_30_days()

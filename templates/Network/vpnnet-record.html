@@ -19,10 +19,9 @@
     <thead>
     <tr>
         <th>日期</th>
-        <th>起始时间</th>
-        <th>结束时间</th>
-        <th>起始流量</th>
-        <th>时段流量</th>
+        <th>倍率</th>
+        <th>上传流量</th>
+        <th>下载流量</th>
     </tr>
     </thead>
     <tbody id="tbody"></tbody>
@@ -34,5 +33,5 @@
 <script src="{% static 'Base/js/request.js' %}"></script>
 <script src="{% static 'Network/vpnnet/js/main.js' %}"></script>
 <script>
-    new VPNNetSession();
+    new VPNNetRecord();
 </script>
