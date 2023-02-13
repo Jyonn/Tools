@@ -18,7 +18,6 @@ class VPNNetSession {
 
     load_key() {
         this.key = Store.load(this.StoreKEY);
-        console.log(this.key)
         if (this.key) {
             this.update();
         } else {

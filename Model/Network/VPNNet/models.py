@@ -66,6 +66,9 @@ class Record(models.Model):
         if updated and date == datetime.date.today():
             Session.insert(record)
 
+    def _readable_date(self):
+        return self.date.strftime('%Y-%m-%d')
+
     def d(self):
         return self.dictify('date', 'rate', 'upload', 'download')
 
