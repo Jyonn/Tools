@@ -34,6 +34,25 @@ class Record(models.Model):
         default=0,
     )
 
+    @staticmethod
+    def _readable_size(size):
+        if size < 1024:
+            return f'{size}B'
+        size = int(size / 1024)
+        if size < 1024:
+            return f'{size}KB'
+        size = int(size / 1024)
+        if size < 1024:
+            return f'{size}MB'
+        size = int(size / 1024)
+        return f'{size}GB'
+
+    def _readable_upload(self):
+        return self._readable_size(self.upload)
+
+    def _readable_download(self):
+        return self._readable_size(self.download)
+
     @classmethod
     def get(cls, date, rate):
         try:
