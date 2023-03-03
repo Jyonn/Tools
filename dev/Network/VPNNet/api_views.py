@@ -2,7 +2,6 @@ import datetime
 
 import requests
 from SmartDjango import E, Analyse
-from SmartDjango.p import P
 from django import views
 
 from Model.Base.Config.models import Config, CI
