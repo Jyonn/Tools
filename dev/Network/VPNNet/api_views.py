@@ -67,7 +67,7 @@ class SessionView(views.View):
     @Analyse.r(q=['token'])
     def get(r):
         verify_token(r.d.token)
-        return Session.list_30_days()
+        return Session.list_90_days()
 
 
 class RecordView(views.View):
@@ -75,4 +75,4 @@ class RecordView(views.View):
     @Analyse.r(q=['token'])
     def get(r):
         verify_token(r.d.token)
-        return Record.list_30_days()
+        return Record.list_90_days()

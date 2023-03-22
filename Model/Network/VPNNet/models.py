@@ -92,9 +92,9 @@ class Record(models.Model):
         return self.dictify('date', 'rate', 'upload', 'download')
 
     @classmethod
-    def list_30_days(cls):
+    def list_90_days(cls):
         today = datetime.date.today()
-        thirty_days_ago = today - datetime.timedelta(days=30)
+        thirty_days_ago = today - datetime.timedelta(days=90)
         return cls.objects.filter(date__gte=thirty_days_ago).order_by('-date').dict(cls.d)
 
 
@@ -218,9 +218,9 @@ class Session(models.Model):
         return None
 
     @classmethod
-    def list_30_days(cls):
+    def list_90_days(cls):
         today = datetime.date.today()
-        thirty_days_ago = today - datetime.timedelta(days=30)
+        thirty_days_ago = today - datetime.timedelta(days=90)
         return cls.objects.filter(record__date__gte=thirty_days_ago).order_by('-record__date', '-start').dict(cls.d)
 
     def d(self):
