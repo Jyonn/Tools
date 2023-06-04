@@ -36,7 +36,9 @@ class CallbackView(View):
         width, height = foto_info['width'], foto_info['height']
 
         foto = Foto.create(
-            **r.d.dict('key', 'mime_type', 'album'),
+            key=r.d.key,
+            mime_type=r.d.mime_type,
+            album=r.d.album,
             color_average=color_average,
             width=width,
             height=height,
