@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class PhraseConfig(AppConfig):
-    name = 'Phrase'
+    name = 'Model.Language.Phrase'

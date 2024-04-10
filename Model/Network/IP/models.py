@@ -75,4 +75,4 @@ class IP(models.Model):
         return O.ip_int2dot(self.ip_end)
 
     def d(self):
-        return self.dictor('ip_start', 'ip_end', 'country', 'province', 'city', 'owner', 'line')
+        return self.dictify('ip_start', 'ip_end', 'country', 'province', 'city', 'owner', 'line')

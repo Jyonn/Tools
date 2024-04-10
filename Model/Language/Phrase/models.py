@@ -144,7 +144,7 @@ class Phrase(models.Model):
         return json.loads(self.py)
 
     def d(self):
-        return self.dictor('cy', 'py', 'id')
+        return self.dictify('cy', 'py', 'id')
 
 
 class Tag(models.Model):
@@ -204,7 +204,7 @@ class Tag(models.Model):
         return self.pk
 
     def d(self):
-        return self.dictor('name', 'start', 'id')
+        return self.dictify('name', 'start', 'id')
 
 
 class TagMap(models.Model):
@@ -220,9 +220,11 @@ class TagMap(models.Model):
         on_delete=models.CASCADE,
     )
 
-    match = models.NullBooleanField(
+    match = models.BooleanField(
         verbose_name='是否匹配',
-        help_text='null未知 true匹配 false相反'
+        help_text='null未知 true匹配 false相反',
+        null=True,
+        blank=True,
     )
 
     class Meta:
@@ -262,7 +264,7 @@ class TagMap(models.Model):
         return self.phrase.d()
 
     def d(self):
-        return self.dictor('phrase', 'match')
+        return self.dictify('phrase', 'match')
 
 
 class Link(models.Model):

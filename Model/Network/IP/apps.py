@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class IpConfig(AppConfig):
-    name = 'IP'
+    name = 'Model.Network.IP'

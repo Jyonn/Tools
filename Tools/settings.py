@@ -10,6 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
+import pymysql
+pymysql.install_as_MySQLdb()
+
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -20,9 +23,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '_g%y&lf8^x33-q^ocw8dh2#hc$tqhc8^*@vn--fx%na6-twsf_'
+SECRET_KEY = 'YOUR-SECRET-KEY'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+PROJ_INIT = True
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', 'tools.6-79.cn', '*']
