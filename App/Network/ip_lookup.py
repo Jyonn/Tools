@@ -1,4 +1,4 @@
-from SmartDjango import Analyse, P
+from smartdjango import Validator, analyse
 
 from Base.handler import BaseHandler
 from Base.param_limit import PL
@@ -9,7 +9,7 @@ class IPLookup(BaseHandler):
     APP_NAME = '国内IP查询'
     APP_DESC = '获取地域和IP段'
 
-    BODY = [P('ip', 'ip地址').process(PL.ip_dot2int).process(IP.lookup)]
+    BODY = [Validator('ip', 'ip地址').to(PL.ip_dot2int).to(IP.lookup)]
 
     REQUEST_EXAMPLE = {"ip": "39.174.135.244"}
     RESPONSE_EXAMPLE = {
@@ -23,6 +23,6 @@ class IPLookup(BaseHandler):
     }
 
     @staticmethod
-    @Analyse.r(b=BODY)
-    def run(r):
-        return r.d.ip.d()
+    @analyse.json(*BODY)
+    def run(request):
+        return request.json.ip.d()

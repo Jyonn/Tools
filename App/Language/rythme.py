@@ -1,5 +1,4 @@
-from SmartDjango import Analyse, P
-from smartify import PDict
+from smartdjango import Validator, DictValidator, analyse
 
 from Base.handler import BaseHandler
 from Base.param_limit import PL
@@ -27,25 +26,29 @@ class Rythme(BaseHandler):
     APP_DESC = '查找和目标押韵（支持二押及以上）的词语'
 
     BODY = [
-        P('py', '拼音').validate(list),
-        PDict(name='phrase', read_name='目标词语长度限制').null().set_fields(
-            P('max', '词语最大长度').null(), P('min', '词语最小长度').null()),
-        PDict(name='rythme', read_name='目标词语押韵限制').null().set_fields(
-            P('max', '词语最长押韵数').null(), P('min', '词语最短押韵数').null()),
-        P('cluster', '押韵拼音组').null(),
-        P('cluster_type', '押韵拼音组模式')
-            .default('normal').process(PL.choices(SyllableClusters)),
+        Validator('py', '拼音').to(list),
+        DictValidator(name='phrase', verbose_name='目标词语长度限制').null().default(None).field(
+            Validator('max', '词语最大长度').null().default(None),
+            Validator('min', '词语最小长度').null().default(None)
+        ),
+        DictValidator(name='rythme', verbose_name='目标词语押韵限制').null().default(None).field(
+            Validator('max', '词语最长押韵数').null().default(None),
+            Validator('min', '词语最短押韵数').null().default(None)
+        ),
+        Validator('cluster', '押韵拼音组').null().default(None),
+        Validator('cluster_type', '押韵拼音组模式')
+            .default('normal').to(PL.choices(SyllableClusters)),
     ]
 
     SUB_ROUTER = Router()
     SUB_ROUTER.register_param('cluster', RythmeCluster)
 
     @staticmethod
-    @Analyse.r(b=BODY)
-    def run(r):
-        py = r.d.py
-        phrase_limit = r.d.phrase or dict(max=None, min=None)
-        rythme_limit = r.d.rythme or dict(max=None, min=None)
-        cluster = r.d.cluster
-        cluster_type = r.d.cluster_type
+    @analyse.json(*BODY)
+    def run(request):
+        py = request.json.py
+        phrase_limit = request.json.phrase or dict(max=None, min=None)
+        rythme_limit = request.json.rythme or dict(max=None, min=None)
+        cluster = request.json.cluster
+        cluster_type = request.json.cluster_type
 

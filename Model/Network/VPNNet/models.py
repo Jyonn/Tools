@@ -1,17 +1,15 @@
 import datetime
 
-from SmartDjango import models, E
+from diq import Dictify
+from django.db import models
+from smartdjango import Error
+
+from Model.Network.VPNNet.validators import RecordValidator, VPNNetErrors
 
 
-@E.register(id_processor=E.idp_cls_prefix())
-class VPNNetError:
-    RECORD_NOT_FOUND = E('找不到记录')
-    INTERVAL_NOT_REACHED = E('间隔未到')
-    LOGIN_FAILED = E('登录失败')
-    LOG_FAILED = E('获取日志失败')
+class Record(models.Model, Dictify):
+    vldt = RecordValidator
 
-
-class Record(models.Model):
     class Meta:
         unique_together = ('date', 'rate')
 
@@ -21,7 +19,7 @@ class Record(models.Model):
 
     rate = models.CharField(
         verbose_name='速率',
-        max_length=10,
+        max_length=vldt.MAX_RATE_LENGTH,
     )
 
     upload = models.PositiveIntegerField(
@@ -35,7 +33,7 @@ class Record(models.Model):
     )
 
     @staticmethod
-    def _readable_size(size):
+    def _dictify_size(size):
         if size < 1024:
             return f'{size}B'
         size = int(size / 1024)
@@ -47,18 +45,18 @@ class Record(models.Model):
         size = int(size / 1024)
         return f'{size}GB'
 
-    def _readable_upload(self):
-        return self._readable_size(self.upload)
+    def _dictify_upload(self):
+        return self._dictify_size(self.upload)
 
-    def _readable_download(self):
-        return self._readable_size(self.download)
+    def _dictify_download(self):
+        return self._dictify_size(self.download)
 
     @classmethod
     def get(cls, date, rate):
         try:
             return cls.objects.get(date=date, rate=rate)
         except cls.DoesNotExist:
-            raise VPNNetError.RECORD_NOT_FOUND
+            raise VPNNetErrors.RECORD_NOT_FOUND
 
     @classmethod
     def create(cls, date, rate):
@@ -68,8 +66,8 @@ class Record(models.Model):
     def get_or_create(cls, date, rate):
         try:
             return cls.get(date, rate)
-        except E as e:
-            assert e.eis(VPNNetError.RECORD_NOT_FOUND)
+        except Error as e:
+            assert e == VPNNetErrors.RECORD_NOT_FOUND
             return cls.create(date, rate)
         except Exception as e:
             raise e
@@ -85,7 +83,7 @@ class Record(models.Model):
         if updated and date == datetime.date.today():
             Session.insert(record)
 
-    def _readable_date(self):
+    def _dictify_date(self):
         return self.date.strftime('%Y-%m-%d')
 
     def d(self):
@@ -95,10 +93,11 @@ class Record(models.Model):
     def list_90_days(cls):
         today = datetime.date.today()
         thirty_days_ago = today - datetime.timedelta(days=90)
-        return cls.objects.filter(date__gte=thirty_days_ago).order_by('-date').dict(cls.d)
+        records = cls.objects.filter(date__gte=thirty_days_ago).order_by('-date')
+        return [record.d() for record in records]
 
 
-class Session(models.Model):
+class Session(models.Model, Dictify):
     INTERVAL = 30 * 60
 
     record = models.ForeignKey(
@@ -174,19 +173,19 @@ class Session(models.Model):
         return latest_session
 
     @staticmethod
-    def _readable_time(time):
+    def _dictify_time(time):
         return time.strftime('%H:%M:%S')
 
-    def _readable_start(self):
+    def _dictify_start(self):
         assert isinstance(self.start, datetime.datetime)
-        return self._readable_time(self.start)
+        return self._dictify_time(self.start)
 
-    def _readable_end(self):
+    def _dictify_end(self):
         assert isinstance(self.end, datetime.datetime)
-        return self._readable_time(self.end)
+        return self._dictify_time(self.end)
 
     @staticmethod
-    def _readable_size(size):
+    def _dictify_size(size):
         if size < 1024:
             return f'{size}B'
         size = int(size / 1024)
@@ -198,21 +197,21 @@ class Session(models.Model):
         size = int(size / 1024)
         return f'{size}GB'
 
-    def _readable_upload(self):
+    def _dictify_upload(self):
         byte = self.end_upload - self.start_upload
-        return self._readable_size(byte)
+        return self._dictify_size(byte)
 
-    def _readable_download(self):
+    def _dictify_download(self):
         byte = self.end_download - self.start_download
-        return self._readable_size(byte)
+        return self._dictify_size(byte)
 
-    def _readable_start_upload(self):
-        return self._readable_size(self.start_upload)
+    def _dictify_start_upload(self):
+        return self._dictify_size(self.start_upload)
 
-    def _readable_start_download(self):
-        return self._readable_size(self.start_download)
+    def _dictify_start_download(self):
+        return self._dictify_size(self.start_download)
 
-    def _readable_date(self):
+    def _dictify_date(self):
         if self.record:
             return self.record.date.strftime('%Y-%m-%d')
         return None
@@ -221,7 +220,8 @@ class Session(models.Model):
     def list_90_days(cls):
         today = datetime.date.today()
         thirty_days_ago = today - datetime.timedelta(days=90)
-        return cls.objects.filter(record__date__gte=thirty_days_ago).order_by('-record__date', '-start').dict(cls.d)
+        sessions = cls.objects.filter(record__date__gte=thirty_days_ago).order_by('-record__date', '-start')
+        return [session.d() for session in sessions]
 
     def d(self):
         return self.dictify(

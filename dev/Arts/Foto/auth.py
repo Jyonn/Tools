@@ -1,14 +1,14 @@
 from functools import wraps
 from hashlib import md5
 
-from SmartDjango import E
+from smartdjango import Error, Code
 
 from dev.Arts.Foto.base import ADMIN_TOKEN
 
 
-@E.register(id_processor=E.idp_cls_prefix())
-class AuthError:
-    ADMIN = E("需要管理员身份登录")
+@Error.register
+class AuthErrors:
+    ADMIN = Error("需要管理员身份登录", code=Code.Forbidden)
 
 
 class Auth:
@@ -22,7 +22,7 @@ class Auth:
     def validate_token(cls, request):
         token = request.META.get('HTTP_TOKEN')
         if not token or cls.get_md5(token) != ADMIN_TOKEN:
-            raise AuthError.ADMIN
+            raise AuthErrors.ADMIN
 
     @classmethod
     def require_admin(cls, func):

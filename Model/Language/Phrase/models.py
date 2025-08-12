@@ -10,54 +10,30 @@ import json
 from typing import Optional, List
 
 import pypinyin
-from SmartDjango import models, E
+from diq import Dictify
+from django.db import models
+from smartdjango import Error
+
+from Model.Language.Phrase.validators import PhraseValidator, PhraseErrors
 
 
-@E.register(id_processor=E.idp_cls_prefix())
-class PhraseError:
-    SETMEMBER_CONFLICT = E("组内集合元素[{0}]重复")
-    GET_GROUPSETMEMBER = E("获取组内集合元素[{0}]失败")
-    GROUPSETMEMBER_NOT_FOUND = E("找不到组内集合元素[{0}]")
-    CREATE_GROUPSETMEMBER = E("新建组内集合元素[{0}]失败")
+class Phrase(models.Model, Dictify):
+    vldt = PhraseValidator
 
-    GROUP_NAME_CONFLICT = E("组别[{0}]名称重复")
-    CREATE_GROUP = E("新增组别[{0}]失败")
-    GET_GROUP = E("获取组别[{0}]失败")
-    GROUP_NOT_FOUND = E("找不到组别[{0}]")
-
-    CREATE_LINK = E("新增[{0}]到[{1}]的链接失败")
-    GET_LINK = E("获取[{0}]到[{1}]的链接失败")
-    LINK_NOT_FOUND = E("找不到[{0}]到[{1}]的链接")
-
-    CREATE_TAGMAP = E("新增[{0}]对应的[{1}]属性失败")
-    GET_TAGMAP = E("找到词语[{0}]，获取其[{1}]属性失败")
-    TAGMAP_NOT_FOUND = E("找到词语[{0}]，但无[{1}]属性")
-
-    TAG_NAME_CONFLICT = E("属性[{0}]名称重复")
-    GET_TAG = E("获取属性[{0}]失败")
-    TAG_NOT_FOUND = E("找不到标签[{0}]")
-    CREATE_TAG = E("新增属性[{0}]失败")
-
-    PHRASE_NOT_FOUND = E("找不到词语[{0}]")
-    GET_PHRASE = E("获取词语[{0}]失败")
-    CREATE_PHRASE = E("新增词语[{0}]失败")
-
-
-class Phrase(models.Model):
     cy = models.CharField(
         verbose_name='词语',
-        max_length=20,
+        max_length=vldt.MAX_CY_LENGTH,
         db_index=True,
     )
 
     py = models.CharField(
         verbose_name='拼音',
-        max_length=150,
+        max_length=vldt.MAX_PY_LENGTH,
     )
 
     number_py = models.CharField(
         verbose_name='带数字带拼音',
-        max_length=165,
+        max_length=vldt.MAX_NUMBER_PY_LENGTH,
         default=None
     )
 
@@ -87,14 +63,15 @@ class Phrase(models.Model):
 
     @classmethod
     def _get(cls, cy, number_py):
-        cls.validator(locals())
+        # cls.validator(locals())
+        # TODO: validator
 
         try:
             return cls.objects.get(cy=cy, number_py=number_py)
         except cls.DoesNotExist:
-            raise PhraseError.PHRASE_NOT_FOUND(cy)
+            raise PhraseErrors.PHRASE_NOT_FOUND(cy)
         except Exception as err:
-            raise PhraseError.GET_PHRASE(cy, debug_message=err)
+            raise PhraseErrors.GET_PHRASE(cy, details=err)
 
     @classmethod
     def get(cls, cy, py: Optional[list] = None):
@@ -109,19 +86,20 @@ class Phrase(models.Model):
         try:
             return cls.objects.get(pk=id_)
         except cls.DoesNotExist:
-            raise PhraseError.PHRASE_NOT_FOUND(id_)
+            raise PhraseErrors.PHRASE_NOT_FOUND(id_)
         except Exception as err: 
-            raise PhraseError.GET_PHRASE(id_, debug_message=err)
+            raise PhraseErrors.GET_PHRASE(id_, details=err)
 
     @classmethod
     def _new(cls, cy, py, clen, plen, number_py):
-        cls.validator(locals())
+        # cls.validator(locals())
+        # TODO: validator
 
         try:
             phrase = cls(cy=cy, py=py, clen=clen, plen=plen, number_py=number_py)
             phrase.save()
         except Exception as err:
-            raise PhraseError.CREATE_PHRASE(cy, debug_message=err)
+            raise PhraseErrors.CREATE_PHRASE(cy, details=err)
         return phrase
 
     @classmethod
@@ -147,7 +125,7 @@ class Phrase(models.Model):
         return self.dictify('cy', 'py', 'id')
 
 
-class Tag(models.Model):
+class Tag(models.Model, Dictify):
     name = models.CharField(
         verbose_name='标签',
         max_length=10,
@@ -164,34 +142,34 @@ class Tag(models.Model):
         try:
             return cls.objects.get(pk=id_)
         except cls.DoesNotExist:
-            raise PhraseError.TAG_NOT_FOUND(id_)
+            raise PhraseErrors.TAG_NOT_FOUND(id_)
         except Exception as err:
-            raise PhraseError.GET_TAG(id_, debug_message=err)
+            raise PhraseErrors.GET_TAG(id_, details=err)
 
     @classmethod
     def get(cls, name):
         try:
             return cls.objects.get(name=name)
         except cls.DoesNotExist:
-            raise PhraseError.TAG_NOT_FOUND(name)
+            raise PhraseErrors.TAG_NOT_FOUND(name)
         except Exception as err:
-            raise PhraseError.GET_TAG(name, debug_message=err)
+            raise PhraseErrors.GET_TAG(name, details=err)
 
     @classmethod
     def new(cls, name):
         try:
             cls.get(name)
-        except E as e:
-            if e.eis(PhraseError.TAG_NOT_FOUND):
+        except Error as e:
+            if e == PhraseErrors.TAG_NOT_FOUND:
                 try:
                     tag = cls(name=name, start=0)
                     tag.save()
                 except Exception as err:
-                    raise PhraseError.CREATE_TAG(name, debug_message=err)
+                    raise PhraseErrors.CREATE_TAG(name, details=err)
                 return tag
             else:
                 return e
-        raise PhraseError.TAG_NAME_CONFLICT(name)
+        raise PhraseErrors.TAG_NAME_CONFLICT(name)
 
     def put(self, name):
         self.name = name
@@ -207,7 +185,7 @@ class Tag(models.Model):
         return self.dictify('name', 'start', 'id')
 
 
-class TagMap(models.Model):
+class TagMap(models.Model, Dictify):
     phrase = models.ForeignKey(
         Phrase,
         verbose_name='关联词语',
@@ -235,9 +213,9 @@ class TagMap(models.Model):
         try:
             return cls.objects.get(phrase=phrase, tag=tag)
         except cls.DoesNotExist:
-            raise PhraseError.TAGMAP_NOT_FOUND(phrase.cy, tag.name)
+            raise PhraseErrors.TAGMAP_NOT_FOUND(phrase.cy, tag.name)
         except Exception as err:
-            raise PhraseError.GET_TAGMAP(phrase.cy, tag.name, debug_message=err)
+            raise PhraseErrors.GET_TAGMAP(phrase.cy, tag.name, details=err)
 
     @classmethod
     def new_or_put(cls, phrase, tag, match=True):
@@ -245,8 +223,8 @@ class TagMap(models.Model):
             tagmap = cls.get(phrase, tag)
             tagmap.match = match
             tagmap.save()
-        except E as e:
-            if e.eis(PhraseError.TAGMAP_NOT_FOUND):
+        except Error as e:
+            if e == PhraseErrors.TAGMAP_NOT_FOUND:
                 try:
                     tagmap = cls(
                         phrase=phrase,
@@ -255,7 +233,7 @@ class TagMap(models.Model):
                     )
                     tagmap.save()
                 except Exception as err: 
-                    raise PhraseError.CREATE_TAGMAP(phrase.cy, tag.name, debug_message=err)
+                    raise PhraseErrors.CREATE_TAGMAP(phrase.cy, tag.name, details=err)
             else:
                 return e
         return tagmap
@@ -267,7 +245,7 @@ class TagMap(models.Model):
         return self.dictify('phrase', 'match')
 
 
-class Link(models.Model):
+class Link(models.Model, Dictify):
     linking = models.ForeignKey(
         Phrase,
         verbose_name='关联词语',
@@ -290,16 +268,16 @@ class Link(models.Model):
         try:
             return cls.objects.get(linked=linked, linking=linking)
         except cls.DoesNotExist:
-            raise PhraseError.LINK_NOT_FOUND(linking.cy, linked.cy)
+            raise PhraseErrors.LINK_NOT_FOUND(linking.cy, linked.cy)
         except Exception as err: 
-            raise PhraseError.GET_LINK(linking.cy, linked.cy, debug_message=err)
+            raise PhraseErrors.GET_LINK(linking.cy, linked.cy, details=err)
 
     @classmethod
     def new_or_get(cls, linking: Phrase, linked: Phrase):
         try:
             link = cls.get(linking, linked)
-        except E as ret:
-            if ret.eis(PhraseError.LINK_NOT_FOUND):
+        except Error as e:
+            if e == PhraseErrors.LINK_NOT_FOUND:
                 try:
                     link = cls(
                         linking=linking,
@@ -307,9 +285,9 @@ class Link(models.Model):
                     )
                     link.save()
                 except Exception as err: 
-                    raise PhraseError.CREATE_LINK(linking.cy, linked.cy, debug_message=err)
+                    raise PhraseErrors.CREATE_LINK(linking.cy, linked.cy, details=err)
             else:
-                raise ret
+                raise e
         return link
 
 
@@ -325,24 +303,24 @@ class Group(models.Model):
         try:
             return cls.objects.get(name=name)
         except cls.DoesNotExist:
-            raise PhraseError.GROUP_NOT_FOUND(name)
+            raise PhraseErrors.GROUP_NOT_FOUND(name)
         except Exception as err: 
-            raise PhraseError.GET_GROUP(name, debug_message=err)
+            raise PhraseErrors.GET_GROUP(name, details=err)
 
     @classmethod
     def new(cls, name):
         try:
             cls.get(name)
-        except E as e:
-            if e.eis(PhraseError.GROUP_NOT_FOUND):
+        except Error as e:
+            if e == PhraseErrors.GROUP_NOT_FOUND:
                 try:
                     group = cls(name=name)
                     group.save()
                 except Exception as err: 
-                    raise PhraseError.CREATE_GROUP(name, debug_message=err)
+                    raise PhraseErrors.CREATE_GROUP(name, details=err)
             else:
                 return e
-        raise PhraseError.GROUP_NAME_CONFLICT(name)
+        raise PhraseErrors.GROUP_NAME_CONFLICT(name)
 
     def push(self, phrases: List[Phrase]):
         return GroupSet.new(self, phrases)
@@ -385,22 +363,22 @@ class GroupSetMember(models.Model):
         try:
             return cls.objects.get(set=set_, phrase=phrase)
         except cls.DoesNotExist:
-            raise PhraseError.GROUPSETMEMBER_NOT_FOUND(phrase.cy)
+            raise PhraseErrors.GROUPSETMEMBER_NOT_FOUND(phrase.cy)
         except Exception as err: 
-            raise PhraseError.GET_GROUPSETMEMBER(phrase.cy, debug_message=err)
+            raise PhraseErrors.GET_GROUPSETMEMBER(phrase.cy, details=err)
 
     @classmethod
     def new(cls, set_: GroupSet, phrase: Phrase):
         try:
             cls.get(set_, phrase)
-        except E as ret:
-            if ret.eis(PhraseError.GROUPSETMEMBER_NOT_FOUND):
+        except Error as e:
+            if e == PhraseErrors.GROUPSETMEMBER_NOT_FOUND:
                 try:
                     member = cls(set=set_, phrase=phrase)
                     member.save()
                     return member
                 except Exception as err: 
-                    raise PhraseError.CREATE_GROUPSETMEMBER(phrase.cy, debug_message=err)
+                    raise PhraseErrors.CREATE_GROUPSETMEMBER(phrase.cy, details=err)
             else:
-                return ret
-        raise PhraseError.SETMEMBER_CONFLICT(phrase.cy)
+                return e
+        raise PhraseErrors.SETMEMBER_CONFLICT(phrase.cy)

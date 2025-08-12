@@ -1,8 +1,8 @@
-from SmartDjango import Analyse
 from django.views import View
-from smartify import P, PDict
+from smartdjango import analyse, Validator, OK
 
-from Model.Arts.Foto.models import Foto, AlbumP, Album, FotoP, SpaceP
+from Model.Arts.Foto.models import Foto, Album
+from Model.Arts.Foto.params import AlbumParams, SpaceParams, FotoParams
 from dev.Arts.Foto.auth import Auth
 from dev.Arts.Foto.base import qn_manager, boundary
 
@@ -10,20 +10,20 @@ from dev.Arts.Foto.base import qn_manager, boundary
 class CallbackView(View):
     """/dev/Arts/Foto/callback"""
 
-    @staticmethod
-    @Analyse.r(b=PDict().set_fields(
+    @analyse.json(
         'key',
         'mime_type',
         'color_average',
         'image_info',
-        AlbumP.name,
-        SpaceP.name_getter).process(Album.getter)
+        AlbumParams.name,
+        SpaceParams.name_getter
     )
-    def post(r):
-        qn_manager.auth_callback(r)
+    def post(self, request):
+        qn_manager.auth_callback(request)
+        request.json.album = Album.get_by_name(**request.json())
 
-        color_average = r.d.color_average['RGB']  # type: str
-        foto_info = r.d.image_info
+        color_average = request.json.color_average['RGB']  # type: str
+        foto_info = request.json.image_info
 
         if 'orientation' in foto_info:
             try:
@@ -36,9 +36,9 @@ class CallbackView(View):
         width, height = foto_info['width'], foto_info['height']
 
         foto = Foto.create(
-            key=r.d.key,
-            mime_type=r.d.mime_type,
-            album=r.d.album,
+            key=request.json.key,
+            mime_type=request.json.mime_type,
+            album=request.json.album,
             color_average=color_average,
             width=width,
             height=height,
@@ -49,18 +49,15 @@ class CallbackView(View):
 
 
 class TokenView(View):
-    @staticmethod
-    @Analyse.r(
-        q=PDict().set_fields(
-            SpaceP.name_getter,
-            AlbumP.name,
-            P('image_num', '图片数量').process(boundary(max_=99, min_=1))
-        ).process(Album.getter)
+    @analyse.query(
+        SpaceParams.name_getter,
+        AlbumParams.name,
+        Validator('image_num', '图片数量').to(boundary(max_=99, min_=1))
     )
     @Auth.require_admin
-    def get(r):
-        album = r.d.album
-        image_num = r.d.image_num
+    def get(self, request):
+        album = Album.get_by_name(**request.json())
+        image_num = request.json.image_num
 
         return Foto.get_tokens(
             num=image_num,
@@ -70,88 +67,65 @@ class TokenView(View):
 
 
 class HomeView(View):
-    @staticmethod
-    @Analyse.r(q=[SpaceP.name_getter])
-    def get(r):
-        return r.d.space.d()
+    @analyse.query(SpaceParams.name_getter)
+    def get(self, request):
+        return request.query.space.d()
 
 
 class FotoView(View):
-    @staticmethod
-    @Analyse.r(
-        a=[FotoP.id_getter]
-    )
-    def get(r):
-        foto = r.d.foto
+    @analyse.argument(FotoParams.id_getter)
+    def get(self, request, **kwargs):
+        foto = request.argument.foto
         return foto.d()
 
-    @staticmethod
-    @Analyse.r(
-        a=[FotoP.id_getter],
-    )
+    @analyse.argument(FotoParams.id_getter)
     @Auth.require_admin
-    def put(r):
-        foto = r.d.foto
+    def put(self, request):
+        foto = request.argument.foto
         foto.toggle_pin()
         return foto.d_base()
 
-    @staticmethod
-    @Analyse.r(
-        a=[FotoP.id_getter],
-    )
+    @analyse.argument(FotoParams.id_getter)
     @Auth.require_admin
-    def delete(r):
-        foto = r.d.foto
+    def delete(self, request):
+        foto = request.argument.foto
         foto.remove()
-        return 0
+        return OK
 
 
 class AlbumView(View):
-    @staticmethod
-    @Analyse.r(
-        q=PDict().set_fields(
-            SpaceP.name_getter,
-            AlbumP.name,
-        ).process(Album.getter)
+    @analyse.query(
+        SpaceParams.name_getter,
+        AlbumParams.name,
     )
-    def get(r):
-        album = r.d.album
+    def get(self, request):
+        album = Album.get_by_name(**request.query())
         return album.d_with_fotos()
 
-    @staticmethod
-    @Analyse.r(
-        b=PDict().set_fields(
-            SpaceP.name_getter,
-            AlbumP.name,
-        ).process(Album.creator)
+    @analyse.json(
+        SpaceParams.name_getter,
+        AlbumParams.name,
     )
     @Auth.require_admin
-    def post(_):
-        return 0
+    def post(self, request):
+        # Album.creator(request.json())
+        Album.create(**request.json())
+        return OK
 
-    @staticmethod
-    @Analyse.r(
-        q=PDict().set_fields(
-            SpaceP.name_getter,
-            AlbumP.name,
-        ).process(Album.getter),
-        b=[AlbumP.name.clone().rename('name')]
-    )
+    @analyse.query(SpaceParams.name_getter, AlbumParams.name)
+    @analyse.json(AlbumParams.name.copy().rename('name'))
     @Auth.require_admin
-    def put(r):
-        album = r.d.album
-        album.rename(r.d.name)
+    def put(self, request):
+        album = Album.get_by_name(**request.query())
+        album.rename(request.body.name)
         return album.d()
 
-    @staticmethod
-    @Analyse.r(
-        q=PDict().set_fields(
-            SpaceP.name_getter,
-            AlbumP.name,
-        ).process(Album.getter)
+    @analyse.query(
+        SpaceParams.name_getter,
+        AlbumParams.name,
     )
     @Auth.require_admin
-    def delete(r):
-        album = r.d.album
+    def delete(self, request):
+        album = Album.get_by_name(**request.query())
         album.remove()
-        return 0
+        return OK

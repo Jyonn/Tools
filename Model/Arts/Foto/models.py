@@ -1,53 +1,45 @@
 import datetime
 
-from SmartDjango import models, E
+from diq import Dictify
+from django.db import models
 from django.utils.crypto import get_random_string
 
+from Model.Arts.Foto.validators import SpaceValidator, FotoErrors, AlbumValidator, FotoValidator
 from dev.Arts.Foto.base import qn_manager, policy
 
 
-@E.register(id_processor=E.idp_cls_prefix())
-class FotoError:
-    NOT_FOUND = E("图片不存在")
-    CREATE = E("图片上传失败")
-    AS_COVER = E("相册封面无法删除")
+class Space(models.Model, Dictify):
+    vldt = SpaceValidator
 
-    ALBUM_CREATE = E("新增相册失败")
-    ALBUM_NOT_FOUND = E("相册不存在")
-
-    SPACE_CREATE = E("新增空间失败")
-    SPACE_NOT_FOUND = E("空间不存在")
-
-
-class Space(models.Model):
     name = models.CharField(
-        max_length=20,
-        min_length=1,
+        max_length=vldt.MAX_NAME_LENGTH,
         unique=True,
+        validators=[vldt.name]
     )
 
     @classmethod
     def create(cls, name):
         try:
             return cls.get_by_name(name)
-        except Exception:
+        except Exception as _:
             pass
 
         try:
             return cls.objects.create(name=name)
         except Exception as err:
-            raise FotoError.SPACE_CREATE(debug_message=err)
+            raise FotoErrors.SPACE_CREATE(debug_message=err)
 
     @classmethod
     def get_by_name(cls, name):
         try:
             return cls.objects.get(name=name)
         except cls.DoesNotExist as err:
-            raise FotoError.SPACE_NOT_FOUND(debug_message=err)
+            raise FotoErrors.SPACE_NOT_FOUND(debug_message=err)
 
     def d(self):
         albums = self.album_set.dict(Album.d)
-        fotos = Foto.get_pinned_fotos(space=self).dict(Foto.d)
+        fotos = Foto.get_pinned_fotos(space=self)
+        fotos = [foto.d() for foto in fotos]
 
         return dict(
             albums=albums,
@@ -55,13 +47,15 @@ class Space(models.Model):
         )
 
 
-class Album(models.Model):
+class Album(models.Model, Dictify):
+    vldt = AlbumValidator
+
     class Meta:
         unique_together = ('name', 'space')
 
     name = models.CharField(
-        max_length=20,
-        min_length=1,
+        max_length=vldt.MAX_NAME_LENGTH,
+        validators=[vldt.name]
     )
 
     space = models.ForeignKey(
@@ -76,32 +70,22 @@ class Album(models.Model):
     def create(cls, name, space):
         try:
             return cls.get_by_name(name, space)
-        except Exception:
+        except Exception as _:
             pass
 
         try:
             return cls.objects.create(name=name, space=space)
         except Exception as err:
-            raise FotoError.ALBUM_CREATE(debug_message=err)
+            raise FotoErrors.ALBUM_CREATE(debug_message=err)
 
     @classmethod
     def get_by_name(cls, name, space):
         try:
             return cls.objects.get(name=name, space=space)
         except cls.DoesNotExist as err:
-            raise FotoError.ALBUM_NOT_FOUND(debug_message=err)
+            raise FotoErrors.ALBUM_NOT_FOUND(debug_message=err)
 
-    @classmethod
-    def getter(cls, value):
-        value['album'] = cls.get_by_name(name=value['album'], space=value['space'])
-        return value
-
-    @classmethod
-    def creator(cls, value):
-        value['album'] = cls.create(name=value['album'], space=value['space'])
-        return value
-
-    def _readable_fotos(self):
+    def _dictify_fotos(self):
         return self.foto_set.dict(Foto.d)
 
     def d(self):
@@ -118,11 +102,13 @@ class Album(models.Model):
         self.save()
 
 
-class Foto(models.Model):
+class Foto(models.Model, Dictify):
+    vldt = FotoValidator
+
     foto_id = models.CharField(
-        max_length=6,
-        min_length=6,
+        max_length=vldt.MAX_FOTO_ID_LENGTH,
         unique=True,
+        validators=[vldt.foto_id]
     )
 
     create_time = models.DateTimeField(
@@ -130,7 +116,7 @@ class Foto(models.Model):
     )
 
     key = models.CharField(
-        max_length=100,
+        max_length=vldt.MAX_KEY_LENGTH,
         unique=True,
     )
 
@@ -138,13 +124,13 @@ class Foto(models.Model):
     height = models.IntegerField()
 
     color_average = models.CharField(
-        max_length=20,
+        max_length=vldt.MAX_COLOR_AVERAGE_LENGTH,
         null=True,
         default=None,
     )
 
     mime_type = models.CharField(
-        max_length=50,
+        max_length=vldt.MAX_MIME_TYPE_LENGTH,
     )
 
     orientation = models.IntegerField(
@@ -210,7 +196,7 @@ class Foto(models.Model):
         try:
             return cls.objects.get(foto_id=foto_id)
         except cls.DoesNotExist:
-            return FotoError.NOT_FOUND
+            return FotoErrors.NOT_FOUND
 
     @classmethod
     def create(cls, width, height, orientation, **kwargs):
@@ -226,7 +212,7 @@ class Foto(models.Model):
                 foto_id=cls.generate_foto_id(),
             )
         except Exception as err:
-            raise FotoError.CREATE(debug_message=err)
+            raise FotoErrors.CREATE(debug_message=err)
 
     @classmethod
     def get_tokens(cls, num, **kwargs):
@@ -272,7 +258,7 @@ class Foto(models.Model):
     def get_pinned_fotos(cls, space):
         return cls.objects.filter(pinned=True, album__space=space)
 
-    def _readable_sources(self):
+    def _dictify_sources(self):
         return dict(
             color=self.color_average,
             origin=self.get_source(auto_rotate=False, resize=None),
@@ -281,10 +267,10 @@ class Foto(models.Model):
             exif=self.get_exif(),
         )
 
-    def _readable_orientation(self):
+    def _dictify_orientation(self):
         return [self.orientation, self.orientation_int2str(self.orientation)]
 
-    def _readable_album(self):
+    def _dictify_album(self):
         return self.album.name
 
     def d(self):

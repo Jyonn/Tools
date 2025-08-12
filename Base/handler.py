@@ -1,9 +1,11 @@
-from SmartDjango import P, E, Hc
+from typing import cast
+
+from smartdjango import Error, Code, Validator, DictValidator, ListValidator
 
 
-@E.register()
-class HandlerError:
-    HANDLER_NOT_IMPLEMENTED = E("未实现的功能", hc=Hc.NotImplemented)
+@Error.register
+class HandlerErrors:
+    HANDLER_NOT_IMPLEMENTED = Error("未实现的功能", code=Code.NotImplemented)
 
 
 class BaseHandler:
@@ -19,26 +21,29 @@ class BaseHandler:
 
     @staticmethod
     def run(r):
-        return HandlerError.HANDLER_NOT_IMPLEMENTED
+        return HandlerErrors.HANDLER_NOT_IMPLEMENTED
 
     @classmethod
-    def readable_param(cls, param: P):
+    def readable_param(cls, param: Validator):
         if isinstance(param, str):
-            param = P(param)
+            param = Validator(param)
+
+        has_default = param.default_value != getattr(param, "_Validator__NoDefaultValue", None)
+        is_dict = isinstance(param, DictValidator)
+        is_list = isinstance(param, ListValidator)
         d_ = dict(
-            name=param.name,
-            desc=param.read_name,
+            name=param.key.name,
+            desc=param.key.verbose_name,
             allow_null=param.allow_null,
-            has_default=param.has_default,
-            type_='dict' if param.is_dict else 'list' if param.is_list else 'atom',
+            has_default=has_default,
+            type_='dict' if is_dict else 'list' if is_list else 'atom',
         )
-        if param.has_default:
+        if has_default:
             d_['default_value'] = param.default_value
-            d_['default_through_processors'] = param.default_through_processors
-        if param.is_dict:
+        if is_dict:
             d_['dict_fields'] = list(map(cls.readable_param, param.dict_fields))
-        if param.is_list and param.list_child:
-            d_['list_child'] = cls.readable_param(param.list_child)
+        if is_list and cast(ListValidator, param).element_validator:
+            d_['list_child'] = cls.readable_param(cast(ListValidator, param).element_validator)
         return d_
 
     def rename(self, app_name=None, app_desc=None):

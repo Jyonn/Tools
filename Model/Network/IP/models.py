@@ -1,16 +1,13 @@
-from SmartDjango import models, E
+from diq import Dictify
+from django.db import models
 
 from Base.operation import O
+from Model.Network.IP.validators import IPValidator, IPErrors
 
 
-@E.register(id_processor=E.idp_cls_prefix())
-class IPError:
-    IP_NOT_FOUND = E("找不到IP[{0}]")
-    CREATE_IP = E("增加IP[{0}]失败")
-    GET_IP = E("查找IP[{0}]失败")
+class IP(models.Model, Dictify):
+    vldt = IPValidator
 
-
-class IP(models.Model):
     ip_start = models.PositiveIntegerField(
         verbose_name='IP起始整型值',
     )
@@ -21,27 +18,27 @@ class IP(models.Model):
 
     country = models.CharField(
         verbose_name='国家或地区',
-        max_length=10,
+        max_length=vldt.MAX_COUNTRY_LENGTH,
     )
 
     province = models.CharField(
         verbose_name='省份',
-        max_length=10,
+        max_length=vldt.MAX_PROVINCE_LENGTH,
     )
 
     city = models.CharField(
         verbose_name='城市',
-        max_length=20,
+        max_length=vldt.MAX_CITY_LENGTH,
     )
 
     owner = models.CharField(
         verbose_name='所有者',
-        max_length=40,
+        max_length=vldt.MAX_OWNER_LENGTH,
     )
 
     line = models.CharField(
         verbose_name='线路',
-        max_length=30,
+        max_length=vldt.MAX_LINE_LENGTH,
     )
 
     @classmethod
@@ -49,29 +46,30 @@ class IP(models.Model):
         locals_ = locals()
         del locals_['cls']
 
-        cls.validator(locals_)
+        # cls.validator(locals_)
+        # TODO: validator
 
         try:
             ip = cls(**locals_)
             ip.save()
             return ip
         except Exception as err:
-            raise IPError.CREATE_IP(
-                '%s, %s' % (O.ip_int2dot(ip_start), O.ip_int2dot(ip_end)), debug_message=err)
+            raise IPErrors.CREATE_IP(
+                '%s, %s' % (O.ip_int2dot(ip_start), O.ip_int2dot(ip_end)), details=err)
 
     @classmethod
     def lookup(cls, ip):
         try:
             return cls.objects.get(ip_start__lte=ip, ip_end__gte=ip)
         except cls.DoesNotExist:
-            raise IPError.IP_NOT_FOUND(O.ip_int2dot(ip))
+            raise IPErrors.IP_NOT_FOUND(O.ip_int2dot(ip))
         except Exception as err:
-            raise IPError.GET_IP(O.ip_int2dot(ip), debug_message=err)
+            raise IPErrors.GET_IP(O.ip_int2dot(ip), details=err)
 
-    def _readable_ip_start(self):
+    def _dictify_ip_start(self):
         return O.ip_int2dot(self.ip_start)
 
-    def _readable_ip_end(self):
+    def _dictify_ip_end(self):
         return O.ip_int2dot(self.ip_end)
 
     def d(self):

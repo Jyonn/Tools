@@ -1,4 +1,4 @@
-from SmartDjango import Analyse, P, Processor
+from smartdjango import Validator, analyse
 
 from Base.handler import BaseHandler
 from Base.router import Router
@@ -30,14 +30,14 @@ class UnicodeFont(BaseHandler):
     APP_DESC = '将正常的英文变为粗体、斜体、花体等，支持微博、朋友圈等常见APP'
 
     BODY = [
-        P('sentence', '句子').validate(str),
-        P('letter_font_id', '英文字体ID')
-            .process(Processor(unicodeFontService.letter_font_jar.get, yield_name='letter_font'))
+        Validator('sentence', '句子').to(str),
+        Validator('letter_font_id', '英文字体ID', final_name='letter_font')
+            .to(unicodeFontService.letter_font_jar.get)
             .null(),
-        P('digit_font_id', '数字字体ID')
-            .process(Processor(unicodeFontService.digit_font_jar.get, yield_name='digit_font'))
+        Validator('digit_font_id', '数字字体ID', final_name='digit_font')
+            .to(unicodeFontService.digit_font_jar.get)
             .null(),
-        P('purify', '是否进行字体清洁').validate(bool).default(True),
+        Validator('purify', '是否进行字体清洁').to(bool).default(True),
     ]
 
     REQUEST_EXAMPLE = {
@@ -66,11 +66,11 @@ class UnicodeFont(BaseHandler):
     SUB_ROUTER.register_usage('purify', PurifyHandler)
 
     @staticmethod
-    @Analyse.r(b=BODY)
-    def run(r):
-        sentence = r.d.sentence
-        letter_font = r.d.letter_font
-        digit_font = r.d.digit_font
-        purity = r.d.purify
+    @analyse.json(*BODY)
+    def run(request):
+        sentence = request.json.sentence
+        letter_font = request.json.letter_font
+        digit_font = request.json.digit_font
+        purity = request.json.purify
 
         return unicodeFontService.fontify(sentence, letter_font, digit_font, purity)

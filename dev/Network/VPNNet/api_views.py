@@ -1,23 +1,23 @@
 import datetime
 
 import requests
-from SmartDjango import E, Analyse
 from django import views
+from smartdjango import Error, Code
 
 from Model.Base.Config.models import Config, CI
-from Model.Network.VPNNet.models import Record, VPNNetError, Session
+from Model.Network.VPNNet.models import Record, VPNNetErrors, Session
 from dev.Network.VPNNet.base import CHECK_INTERVAL, LOGIN_URL, EMAIL, PASSWORD, LOG_URL
 
 
-@E.register(id_processor=E.idp_cls_prefix())
-class DevNetVPNNetError:
-    NOT_ADMIN = E('你不是管理员')
+@Error.register
+class DevNetVPNNetErrors:
+    NOT_ADMIN = Error('你不是管理员', code=Code.Unauthorized)
 
 
 def verify_token(token):
     token_key = 'VPNNET-Token'
     if Config.get_value_by_key(token_key) != token:
-        raise DevNetVPNNetError.NOT_ADMIN
+        raise DevNetVPNNetErrors.NOT_ADMIN
 
 
 class UpdateView(views.View):
@@ -27,7 +27,7 @@ class UpdateView(views.View):
         now = datetime.datetime.now()
         now_ts = int(now.timestamp())
         if now_ts - last_check < CHECK_INTERVAL:
-            return VPNNetError.INTERVAL_NOT_REACHED
+            return VPNNetErrors.INTERVAL_NOT_REACHED
 
         Config.update_value(CI.VPNNET_LAST_CHECK, str(now_ts))
 
@@ -38,12 +38,12 @@ class UpdateView(views.View):
             'password': PASSWORD,
         }) as r:
             if r.status_code != 200:
-                return VPNNetError.LOGIN_FAILED
+                return VPNNetErrors.LOGIN_FAILED
 
         # use requests to get the log page
         with session.get(LOG_URL) as r:
             if r.status_code != 200:
-                return VPNNetError.LOG_FAILED
+                return VPNNetErrors.LOG_FAILED
             data = r.json()['data']
 
         # save the log to the database, only data from today and yesterday will be saved
