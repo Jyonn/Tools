@@ -47,9 +47,9 @@ ToneList = ['āōēīūǖ', 'áóéíúǘń', 'ǎǒěǐǔǚň', 'àòèìùǜǹ'
 
 @Error.register
 class PhraseServiceErrors:
-    SYLLABLE_NOT_FOUND = Error("找不到音节[{0}]", code=Code.NotFound)
-    SYLLABLE_MULTIPLE_TONE = Error("[{0}]音节存在多个声调", code=Code.BadRequest)
-    SYLLABLE_FORMAT = Error("[{0}]音节格式错误", code=Code.BadRequest)
+    SYLLABLE_NOT_FOUND = Error("找不到音节[{name}]", code=Code.NotFound)
+    SYLLABLE_MULTIPLE_TONE = Error("[{name}]音节存在多个声调", code=Code.BadRequest)
+    SYLLABLE_FORMAT = Error("[{name}]音节格式错误", code=Code.BadRequest)
 
 
 class PhraseService:
@@ -94,14 +94,14 @@ class PhraseService:
         """格式化不标准的音节"""
         syllable = syllable.lower()
         if not isinstance(syllable, str):
-            raise PhraseServiceErrors.SYLLABLE_FORMAT((syllable, ''))
+            raise PhraseServiceErrors.SYLLABLE_FORMAT(name=(syllable, ''))
 
         tone = None
         syllable_set = set(syllable)
         for index, tones in enumerate(ToneList):
             if self._get_intersection(syllable_set, tones):
                 if tone:
-                    raise PhraseServiceErrors.SYLLABLE_MULTIPLE_TONE(syllable)
+                    raise PhraseServiceErrors.SYLLABLE_MULTIPLE_TONE(name=syllable)
                 tone = index + 1
 
         for replacer in ToneJar:  # ü居然不用在此处替换为v，ü.is_lower()也是True
@@ -115,17 +115,17 @@ class PhraseService:
                 continue
             if c in '01234':
                 if tone:
-                    raise PhraseServiceErrors.SYLLABLE_MULTIPLE_TONE(syllable)
+                    raise PhraseServiceErrors.SYLLABLE_MULTIPLE_TONE(name=syllable)
                 tone = int(c)
             else:
-                raise PhraseServiceErrors.SYLLABLE_FORMAT(syllable, append_message='存在非法字符')
+                raise PhraseServiceErrors.SYLLABLE_FORMAT(name=syllable, append_message='存在非法字符')
 
         formatted_syllable = formatted_syllable.replace('v', 'ü')
         formatted_syllable = formatted_syllable.replace('lue', 'lüe')
         formatted_syllable = formatted_syllable.replace('nue', 'nüe')
 
         if formatted_syllable not in PlainSyllables:
-            raise PhraseServiceErrors.SYLLABLE_NOT_FOUND(formatted_syllable)
+            raise PhraseServiceErrors.SYLLABLE_NOT_FOUND(name=formatted_syllable)
 
         if printer == 'number_toner':
             printer = self.number_toner

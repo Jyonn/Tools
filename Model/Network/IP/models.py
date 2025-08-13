@@ -55,16 +55,18 @@ class IP(models.Model, Dictify):
             return ip
         except Exception as err:
             raise IPErrors.CREATE_IP(
-                '%s, %s' % (O.ip_int2dot(ip_start), O.ip_int2dot(ip_end)), details=err)
+                ip='%s, %s' % (O.ip_int2dot(ip_start), O.ip_int2dot(ip_end)),
+                details=err
+            )
 
     @classmethod
     def lookup(cls, ip):
         try:
             return cls.objects.get(ip_start__lte=ip, ip_end__gte=ip)
         except cls.DoesNotExist:
-            raise IPErrors.IP_NOT_FOUND(O.ip_int2dot(ip))
+            raise IPErrors.IP_NOT_FOUND(ip=O.ip_int2dot(ip))
         except Exception as err:
-            raise IPErrors.GET_IP(O.ip_int2dot(ip), details=err)
+            raise IPErrors.GET_IP(ip=O.ip_int2dot(ip), details=err)
 
     def _dictify_ip_start(self):
         return O.ip_int2dot(self.ip_start)
