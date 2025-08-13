@@ -1,7 +1,6 @@
 import re
 
 import requests
-# from SmartDjango import E
 
 
 NC_HOST = 'https://nco.zjgsu.edu.cn'

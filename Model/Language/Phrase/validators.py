@@ -1,4 +1,8 @@
-from smartdjango import Error, Code
+import json
+
+from smartdjango import Error, Code, Validator
+
+from Model.Base.Config.models import Config
 
 
 @Error.register
@@ -30,8 +34,20 @@ class PhraseErrors:
     GET_PHRASE = Error("获取词语[{0}]失败", code=Code.InternalServerError)
     CREATE_PHRASE = Error("新增词语[{0}]失败", code=Code.InternalServerError)
 
+    TAG_MISS = Error("缺少标签参数", code=Code.BadRequest)
+
+    CONTRIBUTOR_NOT_FOUND = Error("贡献者不存在", code=Code.NotFound)
+
 
 class PhraseValidator:
     MAX_CY_LENGTH = 20
     MAX_PY_LENGTH = 150
     MAX_NUMBER_PY_LENGTH = 165
+
+    @classmethod
+    def get_contributor(cls, entrance):
+        entrance_key = 'LangPhraseEntrance'
+        entrances = json.loads(Config.get_value_by_key(entrance_key))
+        if entrance in entrances:
+            return entrances[entrance]
+        raise PhraseErrors.CONTRIBUTOR_NOT_FOUND

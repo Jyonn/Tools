@@ -1,44 +1,17 @@
-import json
-
-from SmartDjango import Analyse, BaseError, P, E
-from SmartDjango.models import Pager
 from django.views import View
-from smartdjango import Error, Code, analyse, Validator, OK
+from smartdjango import analyse, Validator, OK
 
 from Base.param_limit import PL
 from Model.Base.Config.models import Config
 from Model.Language.Phrase.models import Tag, TagMap, Phrase
+from Model.Language.Phrase.params import TagParams, PhraseParams
+from Model.Language.Phrase.validators import PhraseErrors
 from Service.Language.phrase import phraseService
-
-
-PM_TAG_NAME = Tag.get_param('name')
-PM_TAG_ID = P('tag_id', yield_name='tag').process(Tag.get_by_id)
-PM_PHRASES = P('phrases').validate(list).process(
-        lambda phrases: list(map(Phrase.get_by_id, phrases)))
-PM_MATCHED = PM_PHRASES.clone().rename('matched')
-PM_UNMATCHED = PM_PHRASES.clone().rename('unmatched')
-PM_ACTION = P('action').process(str).default('add')
-
-
-@Error.register
-class DevLangPhraseErrors:
-    CONTRIBUTOR_NOT_FOUND = Error("贡献者不存在", code=Code.NotFound)
-
-
-def get_contributor(entrance):
-    entrance_key = 'LangPhraseEntrance'
-    entrances = json.loads(Config.get_value_by_key(entrance_key))
-    if entrance in entrances:
-        return entrances[entrance]
-    raise DevLangPhraseErrors.CONTRIBUTOR_NOT_FOUND
-
-
-PM_ENTRANCE = P('entrance', yield_name='contributor').process(get_contributor)
 
 
 class PhraseView(View):
     @analyse.query(
-        PM_TAG_ID,
+        TagParams.id_getter,
         Validator('count').to(int).to(PL.number(100, 1))
     )
     def get(self, request):
@@ -52,7 +25,12 @@ class PhraseView(View):
         # return phrases.dict(Phrase.d)
         return [phrase.d() for phrase in phrases]
 
-    @analyse.json('cy', PM_ENTRANCE, PM_ACTION, PM_TAG_ID.clone().null())
+    @analyse.json(
+        'cy',
+        PhraseParams.contributor,
+        Validator('action').to(str).default('add'),
+        TagParams.id_getter.clone().null()
+    )
     def post(self, request):
         cy = request.json.cy
         action = request.json.action
@@ -66,13 +44,18 @@ class PhraseView(View):
             return cy.d()
 
         if not request.json.tag:
-            return BaseError.MISS_PARAM(('tag_id', '标签'))
+            return PhraseErrors.TAG_MISS
         tag = request.json.tag
         cy = Phrase.get(cy)
         tagmap = TagMap.get(cy, tag)
         return tagmap.d()
 
-    @analyse.json(PM_TAG_ID, PM_MATCHED, PM_UNMATCHED, PM_ENTRANCE)
+    @analyse.json(
+        TagParams.id_getter,
+        PhraseParams.matched,
+        PhraseParams.unmatched,
+        PhraseParams.contributor
+    )
     def put(self, request):
         tag = request.json.tag
         contributor = request.json.contributor
@@ -92,21 +75,21 @@ class TagView(View):
         tags = Tag.objects.all()
         return [tag.d() for tag in tags]
 
-    @analyse.json(PM_TAG_NAME)
+    @analyse.json(TagParams.name)
     def post(self, request):
         name = request.json.name
         Tag.new(name)
         return OK
 
-    @analyse.json(PM_TAG_NAME)
-    @analyse.query(PM_TAG_ID)
+    @analyse.json(TagParams.name)
+    @analyse.query(TagParams.id_getter)
     def put(self, request):
         tag = request.json.tag
         name = request.query.name
         tag.put(name)
         return OK
 
-    @analyse.query(PM_TAG_ID)
+    @analyse.query(TagParams.id_getter)
     def delete(self, request):
         tag = request.query.tag
         tag.remove()
@@ -114,7 +97,7 @@ class TagView(View):
 
 
 class ContributorView(View):
-    @analyse.json(PM_ENTRANCE)
+    @analyse.json(PhraseParams.contributor)
     def post(self, request):
         contributor = request.json.contributor
         contributor_key = 'LangPhraseContributor-' + contributor
@@ -127,7 +110,7 @@ class ContributorView(View):
 
 class ReviewView(View):
     @analyse.query(
-        PM_TAG_ID,
+        TagParams.id_getter,
         Validator('count').to(int).to(PL.number(100, 1)),
         Validator('last').to(int)
     )
@@ -136,5 +119,5 @@ class ReviewView(View):
         last = request.query.last
         count = request.query.count
 
-        objects = TagMap.objects.search(tag=tag)
-        return Pager().page(objects, last, count).dict(TagMap.d)
+        tagmaps = TagMap.objects.filter(tag=tag, pk__gt=last).order_by('pk')[:count]
+        return [tagmap.d() for tagmap in tagmaps]

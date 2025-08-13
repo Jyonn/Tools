@@ -1,10 +1,10 @@
 import re
 import time
 
-from SmartDjango import E
 from aip import AipOcr
 
 import requests
+from smartdjango import Error, Code
 
 from Model.Base.Config.models import Config, CI
 
@@ -33,12 +33,12 @@ replace_table = {
 client = AipOcr(bd_app_id, bd_app_key, bd_app_secret)
 
 
-@E.register()
-class LibraryBookingServiceError:
-    RETRY_TIME_EXPIRE = E("请再试一次")
-    PASSWORD_INCORRECT = E("登录密码不正确")
-    ABNORMAL = E("系统异常")
-    BOOK_FAIL = E("")
+@Error.register
+class LibraryBookingServiceErrors:
+    RETRY_TIME_EXPIRE = Error("请再试一次", code=Code.InternalServerError)
+    PASSWORD_INCORRECT = Error("登录密码不正确", code=Code.Unauthorized)
+    ABNORMAL = Error("系统异常", code=Code.InternalServerError)
+    BOOK_FAIL = Error("预定失败", code=Code.InternalServerError)
 
 
 class LibraryBookingService:
@@ -79,7 +79,7 @@ class LibraryBookingService:
             break
 
         if not recognized:
-            raise LibraryBookingServiceError.RETRY_TIME_EXPIRE
+            raise LibraryBookingServiceErrors.RETRY_TIME_EXPIRE
 
         return captcha
 
@@ -93,7 +93,7 @@ class LibraryBookingService:
 
             try:
                 captcha = cls.recognize_captcha(session)
-            except E as err:
+            except Error as err:
                 if retry_time:
                     continue
                 else:
@@ -109,9 +109,9 @@ class LibraryBookingService:
             if result["msg"] == "验证码错误，请重新输入":
                 continue
             if result["msg"] == "登录密码不正确":
-                raise LibraryBookingServiceError.PASSWORD_INCORRECT
+                raise LibraryBookingServiceErrors.PASSWORD_INCORRECT
             if result["msg"] != "登陆成功":
-                raise LibraryBookingServiceError.ABNORMAL(append_message=result["msg"])
+                raise LibraryBookingServiceErrors.ABNORMAL(append_message=result["msg"])
 
             break
 
@@ -128,7 +128,7 @@ class LibraryBookingService:
                 username = '猪猪🐷'
             return username + result['msg']
         else:
-            raise LibraryBookingServiceError.BOOK_FAIL(append_message=result["msg"])
+            raise LibraryBookingServiceErrors.BOOK_FAIL(append_message=result["msg"])
 
     @staticmethod
     def list_date():

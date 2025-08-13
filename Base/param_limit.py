@@ -1,4 +1,9 @@
-from SmartDjango.models.base import ModelError
+from smartdjango import Error, Code
+
+
+@Error.register
+class ParamLimitErrors:
+    FIELD_FORMAT = Error("字段格式错误", code=Code.BadRequest)
 
 
 class ParamLimit:
@@ -6,16 +11,16 @@ class ParamLimit:
     def str_len(max_len, min_len=0):
         def decorator(string):
             if not isinstance(string, str):
-                raise ModelError.FIELD_FORMAT
+                raise ParamLimitErrors.FIELD_FORMAT
             if len(string) < min_len or len(string) > max_len:
-                raise ModelError.FIELD_FORMAT
+                raise ParamLimitErrors.FIELD_FORMAT
         return decorator
 
     @staticmethod
     def choices(choices):
         def decorator(value):
             if value not in choices:
-                raise ModelError.FIELD_FORMAT
+                raise ParamLimitErrors.FIELD_FORMAT
         return decorator
 
     @staticmethod
@@ -32,13 +37,13 @@ class ParamLimit:
     def ip_dot2int(ip: str):
         ip_seg = ip.split('.')
         if len(ip_seg) != 4:
-            raise ModelError.FIELD_FORMAT('IP地址格式错误')
+            raise ParamLimitErrors.FIELD_FORMAT(details='IP地址格式错误')
         ip_seg = list(map(int, ip_seg))
         ip_number = 0
 
         for seg in ip_seg:
             if seg < 0 or seg > 255:
-                raise ModelError.FIELD_FORMAT('IP地址格式错误')
+                raise ParamLimitErrors.FIELD_FORMAT(details='IP地址格式错误')
             ip_number <<= 8
             ip_number += seg
 

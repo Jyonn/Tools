@@ -1,15 +1,15 @@
-from SmartDjango import E, Hc, NetPacker
 from django.http import HttpRequest
+from smartdjango import Error, Code, APIPacker
 
 from Base.handler import BaseHandler
 from Model.Base.Config.models import Config
 
 
-@E.register()
-class RouterError:
-    NOT_FOUND_ROUTE = E("不存在的API", hc=Hc.NotFound)
-    DISABLED = E("应用被禁用")
-    UNAUTHORIZED = E("没有管理权限")
+@Error.register
+class RouterErrors:
+    NOT_FOUND_ROUTE = Error("不存在的API", code=Code.NotFound)
+    DISABLED = Error("应用被禁用", code=Code.BadRequest)
+    UNAUTHORIZED = Error("没有管理权限", code=Code.Forbidden)
 
 
 class RouteHandler(BaseHandler):
@@ -81,7 +81,7 @@ class Router:
 
     def route(self, r: HttpRequest, path: str):
         if not path:
-            return NetPacker.send(list(map(self.get_base, self.available_handlers)))
+            return APIPacker.pack(list(map(self.get_base, self.available_handlers)))
 
         if path.find('/') >= 0:
             app_name = path[:path.find('/')]
@@ -96,23 +96,23 @@ class Router:
                 return handler.SUB_ROUTER.route(r, sub_path)
             if r.method == 'POST':
                 if self.hidden[app_name]:
-                    return NetPacker.send(RouterError.DISABLED)
+                    return APIPacker.pack(RouterErrors.DISABLED)
                 return handler.run(r)
             elif r.method == 'GET':
                 if isinstance(handler, RouteHandler):
-                    return NetPacker.send(list(map(handler.SUB_ROUTER.get_base,
+                    return APIPacker.pack(list(map(handler.SUB_ROUTER.get_base,
                                                    handler.SUB_ROUTER.available_handlers)))
-                return NetPacker.send(self.get(handler))
+                return APIPacker.pack(self.get(handler))
             elif r.method in ['PUT', 'DELETE']:
                 if not self.authorized(r):
-                    return NetPacker.send(RouterError.UNAUTHORIZED)
+                    return APIPacker.pack(RouterErrors.UNAUTHORIZED)
                 if r.method == 'PUT':
                     self.enable(app_name)
-                    return NetPacker.send('应用成功解禁')
+                    return APIPacker.pack('应用成功解禁')
                 else:
                     self.disable(app_name)
-                    return NetPacker.send('应用成功被禁')
-        return NetPacker.send(RouterError.NOT_FOUND_ROUTE)
+                    return APIPacker.pack('应用成功被禁')
+        return APIPacker.pack(RouterErrors.NOT_FOUND_ROUTE)
 
     def as_handler(self):
         return RouteHandler(self)

@@ -1,7 +1,7 @@
 from typing import Optional, Union, Callable
 from itertools import chain
 
-from SmartDjango import E
+from smartdjango import Error, Code
 
 from Model.Language.Phrase.models import Phrase
 
@@ -45,11 +45,11 @@ ToneJar = {
 ToneList = ['āōēīūǖ', 'áóéíúǘń', 'ǎǒěǐǔǚň', 'àòèìùǜǹ']
 
 
-@E.register()
-class PhraseServiceError:
-    SYLLABLE_NOT_FOUND = E("找不到音节[{0}]")
-    SYLLABLE_MULTIPLE_TONE = E("[{0}]音节存在多个声调")
-    SYLLABLE_FORMAT = E("[{0}]音节格式错误")
+@Error.register
+class PhraseServiceErrors:
+    SYLLABLE_NOT_FOUND = Error("找不到音节[{0}]", code=Code.NotFound)
+    SYLLABLE_MULTIPLE_TONE = Error("[{0}]音节存在多个声调", code=Code.BadRequest)
+    SYLLABLE_FORMAT = Error("[{0}]音节格式错误", code=Code.BadRequest)
 
 
 class PhraseService:
@@ -94,14 +94,14 @@ class PhraseService:
         """格式化不标准的音节"""
         syllable = syllable.lower()
         if not isinstance(syllable, str):
-            raise PhraseServiceError.SYLLABLE_FORMAT((syllable, ''))
+            raise PhraseServiceErrors.SYLLABLE_FORMAT((syllable, ''))
 
         tone = None
         syllable_set = set(syllable)
         for index, tones in enumerate(ToneList):
             if self._get_intersection(syllable_set, tones):
                 if tone:
-                    raise PhraseServiceError.SYLLABLE_MULTIPLE_TONE(syllable)
+                    raise PhraseServiceErrors.SYLLABLE_MULTIPLE_TONE(syllable)
                 tone = index + 1
 
         for replacer in ToneJar:  # ü居然不用在此处替换为v，ü.is_lower()也是True
@@ -115,17 +115,17 @@ class PhraseService:
                 continue
             if c in '01234':
                 if tone:
-                    raise PhraseServiceError.SYLLABLE_MULTIPLE_TONE(syllable)
+                    raise PhraseServiceErrors.SYLLABLE_MULTIPLE_TONE(syllable)
                 tone = int(c)
             else:
-                raise PhraseServiceError.SYLLABLE_FORMAT(syllable, append_message='存在非法字符')
+                raise PhraseServiceErrors.SYLLABLE_FORMAT(syllable, append_message='存在非法字符')
 
         formatted_syllable = formatted_syllable.replace('v', 'ü')
         formatted_syllable = formatted_syllable.replace('lue', 'lüe')
         formatted_syllable = formatted_syllable.replace('nue', 'nüe')
 
         if formatted_syllable not in PlainSyllables:
-            raise PhraseServiceError.SYLLABLE_NOT_FOUND(formatted_syllable)
+            raise PhraseServiceErrors.SYLLABLE_NOT_FOUND(formatted_syllable)
 
         if printer == 'number_toner':
             printer = self.number_toner
