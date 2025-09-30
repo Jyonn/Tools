@@ -2,7 +2,7 @@ import datetime
 
 import requests
 from django import views
-from smartdjango import Error, Code
+from smartdjango import Error, Code, analyse
 
 from Model.Base.Config.models import Config, CI
 from Model.Network.VPNNet.models import Record, VPNNetErrors, Session
@@ -21,8 +21,7 @@ def verify_token(token):
 
 
 class UpdateView(views.View):
-    @staticmethod
-    def get(_):
+    def get(self, request):
         last_check = int(Config.get_value_by_key(CI.VPNNET_LAST_CHECK) or 0)
         now = datetime.datetime.now()
         now_ts = int(now.timestamp())
@@ -63,16 +62,14 @@ class UpdateView(views.View):
 
 
 class SessionView(views.View):
-    @staticmethod
-    @Analyse.r(q=['token'])
-    def get(r):
-        verify_token(r.d.token)
+    @analyse.query('token')
+    def get(self, request):
+        verify_token(request.query.token)
         return Session.list_90_days()
 
 
 class RecordView(views.View):
-    @staticmethod
-    @Analyse.r(q=['token'])
-    def get(r):
-        verify_token(r.d.token)
+    @analyse.query('token')
+    def get(self, request):
+        verify_token(request.query.token)
         return Record.list_90_days()
