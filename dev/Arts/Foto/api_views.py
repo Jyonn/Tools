@@ -99,7 +99,10 @@ class AlbumView(View):
         AlbumParams.name,
     )
     def get(self, request):
-        album = Album.get_by_name(**request.query())
+        album = Album.get_by_name(
+            name=request.json.album,
+            space=request.json.space,
+        )
         return album.d_with_fotos()
 
     @analyse.json(
