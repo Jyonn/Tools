@@ -56,8 +56,11 @@ class TokenView(View):
     )
     @auth.require_admin
     def get(self, request):
-        album = Album.get_by_name(**request.json())
-        image_num = request.json.image_num
+        album = Album.get_by_name(
+            name=request.query.album,
+            space=request.query.space,
+        )
+        image_num = request.query.image_num
 
         return Foto.get_tokens(
             num=image_num,
