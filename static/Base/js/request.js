@@ -71,7 +71,7 @@ class Request {
         return req.json().then((resp) => {
             if (resp.identifier !== 'OK') {
                 if (!this._handler || this._handler(resp)) {
-                    alert(resp.msg);
+                    alert(resp.user_message);
                 }
                 return Promise.reject(resp);
             }
