@@ -27,14 +27,14 @@ class Space(models.Model, Dictify):
         try:
             return cls.objects.create(name=name)
         except Exception as err:
-            raise FotoErrors.SPACE_CREATE(debug_message=err)
+            raise FotoErrors.SPACE_CREATE(details=err)
 
     @classmethod
     def get_by_name(cls, name):
         try:
             return cls.objects.get(name=name)
         except cls.DoesNotExist as err:
-            raise FotoErrors.SPACE_NOT_FOUND(debug_message=err)
+            raise FotoErrors.SPACE_NOT_FOUND(details=err)
 
     def d(self):
         # albums = self.album_set.dict(Album.d)
@@ -77,14 +77,14 @@ class Album(models.Model, Dictify):
         try:
             return cls.objects.create(name=name, space=space)
         except Exception as err:
-            raise FotoErrors.ALBUM_CREATE(debug_message=err)
+            raise FotoErrors.ALBUM_CREATE(details=err)
 
     @classmethod
     def get_by_name(cls, name, space):
         try:
             return cls.objects.get(name=name, space=space)
         except cls.DoesNotExist as err:
-            raise FotoErrors.ALBUM_NOT_FOUND(debug_message=err)
+            raise FotoErrors.ALBUM_NOT_FOUND(details=err)
 
     def _dictify_fotos(self):
         # return self.foto_set.dict(Foto.d)
@@ -214,7 +214,7 @@ class Foto(models.Model, Dictify):
                 foto_id=cls.generate_foto_id(),
             )
         except Exception as err:
-            raise FotoErrors.CREATE(debug_message=err)
+            raise FotoErrors.CREATE(details=err)
 
     @classmethod
     def get_tokens(cls, num, **kwargs):
