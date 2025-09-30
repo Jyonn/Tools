@@ -104,12 +104,11 @@ class AlbumView(View):
 
     @analyse.json(
         SpaceParams.name_getter,
-        AlbumParams.name,
+        AlbumParams.name.copy().rename('name'),
     )
     @auth.require_admin
     def post(self, request):
         # Album.creator(request.json())
-        import pdb; pdb.set_trace()
         Album.create(**request.json())
         return OK
 
