@@ -29,7 +29,7 @@ class PhraseView(View):
         'cy',
         PhraseParams.contributor,
         Validator('action').to(str).default('add'),
-        TagParams.id_getter.clone().null()
+        TagParams.id_getter.copy().null()
     )
     def post(self, request):
         cy = request.json.cy
