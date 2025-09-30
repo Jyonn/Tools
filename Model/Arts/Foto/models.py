@@ -289,16 +289,3 @@ class Foto(models.Model, Dictify):
             'album',
             'foto_id',
         )
-
-
-class SpaceP:
-    name = Space.get_param('name').rename('space')
-    name_getter = name.clone().process(Space.get_by_name)
-
-
-class AlbumP:
-    name = Album.get_param('name').rename('album')
-
-
-class FotoP:
-    id_getter = Foto.get_param('foto_id').clone().rename('foto').process(Foto.get)
