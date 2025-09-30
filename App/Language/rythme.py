@@ -27,11 +27,11 @@ class Rythme(BaseHandler):
 
     BODY = [
         Validator('py', '拼音').to(list),
-        DictValidator(name='phrase', verbose_name='目标词语长度限制').null().default(None).field(
+        DictValidator(name='phrase', verbose_name='目标词语长度限制').null().default(None).fields(
             Validator('max', '词语最大长度').null().default(None),
             Validator('min', '词语最小长度').null().default(None)
         ),
-        DictValidator(name='rythme', verbose_name='目标词语押韵限制').null().default(None).field(
+        DictValidator(name='rythme', verbose_name='目标词语押韵限制').null().default(None).fields(
             Validator('max', '词语最长押韵数').null().default(None),
             Validator('min', '词语最短押韵数').null().default(None)
         ),
