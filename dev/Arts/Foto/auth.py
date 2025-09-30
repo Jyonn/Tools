@@ -1,7 +1,7 @@
 from functools import wraps
 from hashlib import md5
 
-from smartdjango import Error, Code
+from smartdjango import Error, Code, analyse
 
 from dev.Arts.Foto.base import ADMIN_TOKEN
 
@@ -27,8 +27,9 @@ class Auth:
     @classmethod
     def require_admin(cls, func):
         @wraps(func)
-        def wrapper(r, *args, **kwargs):
-            cls.validate_token(r)
-            return func(r, *args, **kwargs)
+        def wrapper(*args, **kwargs):
+            request = analyse.get_request(args)
+            cls.validate_token(request)
+            return func(*args, **kwargs)
 
         return wrapper
