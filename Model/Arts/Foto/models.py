@@ -37,7 +37,8 @@ class Space(models.Model, Dictify):
             raise FotoErrors.SPACE_NOT_FOUND(debug_message=err)
 
     def d(self):
-        albums = self.album_set.dict(Album.d)
+        # albums = self.album_set.dict(Album.d)
+        albums = [album.d() for album in self.album_set.all()]
         fotos = Foto.get_pinned_fotos(space=self)
         fotos = [foto.d() for foto in fotos]
 
@@ -86,7 +87,8 @@ class Album(models.Model, Dictify):
             raise FotoErrors.ALBUM_NOT_FOUND(debug_message=err)
 
     def _dictify_fotos(self):
-        return self.foto_set.dict(Foto.d)
+        # return self.foto_set.dict(Foto.d)
+        return [foto.d() for foto in self.foto_set.all()]
 
     def d(self):
         return self.dictify('name')
