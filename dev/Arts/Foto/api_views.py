@@ -20,7 +20,10 @@ class CallbackView(View):
     )
     def post(self, request):
         qn_manager.auth_callback(request)
-        request.json.album = Album.get_by_name(**request.json())
+        request.json.album = Album.get_by_name(
+            name=request.json.album,
+            space=request.json.space,
+        )
 
         color_average = request.json.color_average['RGB']  # type: str
         foto_info = request.json.image_info
