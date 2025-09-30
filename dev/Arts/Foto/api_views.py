@@ -129,3 +129,4 @@ class AlbumView(View):
         album = Album.get_by_name(**request.query())
         album.remove()
         return OK
+
