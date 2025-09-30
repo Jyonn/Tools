@@ -100,8 +100,8 @@ class AlbumView(View):
     )
     def get(self, request):
         album = Album.get_by_name(
-            name=request.json.album,
-            space=request.json.space,
+            name=request.query.album,
+            space=request.query.space,
         )
         return album.d_with_fotos()
 
