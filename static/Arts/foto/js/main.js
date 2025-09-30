@@ -37,7 +37,7 @@ class FotoPage {
         if (resp.identifier === 'AUTH-ADMIN') {
             Request.saveToken(prompt('Admin Token'))
         } else {
-            alert(resp.msg)
+            alert(resp.user_message)
         }
     }
 
