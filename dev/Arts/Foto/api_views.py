@@ -80,14 +80,14 @@ class FotoView(View):
 
     @analyse.argument(FotoParams.id_getter)
     @auth.require_admin
-    def put(self, request):
+    def put(self, request, **kwargs):
         foto = request.argument.foto
         foto.toggle_pin()
         return foto.d_base()
 
     @analyse.argument(FotoParams.id_getter)
     @auth.require_admin
-    def delete(self, request):
+    def delete(self, request, **kwargs):
         foto = request.argument.foto
         foto.remove()
         return OK
