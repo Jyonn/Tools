@@ -3,7 +3,7 @@ from smartdjango import analyse, Validator, OK
 
 from Model.Arts.Foto.models import Foto, Album
 from Model.Arts.Foto.params import AlbumParams, SpaceParams, FotoParams
-from dev.Arts.Foto.auth import Auth
+from dev.Arts.Foto import auth
 from dev.Arts.Foto.base import qn_manager, boundary
 
 
@@ -54,7 +54,7 @@ class TokenView(View):
         AlbumParams.name,
         Validator('image_num', '图片数量').to(boundary(max_=99, min_=1))
     )
-    @Auth.require_admin
+    @auth.require_admin
     def get(self, request):
         album = Album.get_by_name(**request.json())
         image_num = request.json.image_num
@@ -79,14 +79,14 @@ class FotoView(View):
         return foto.d()
 
     @analyse.argument(FotoParams.id_getter)
-    @Auth.require_admin
+    @auth.require_admin
     def put(self, request):
         foto = request.argument.foto
         foto.toggle_pin()
         return foto.d_base()
 
     @analyse.argument(FotoParams.id_getter)
-    @Auth.require_admin
+    @auth.require_admin
     def delete(self, request):
         foto = request.argument.foto
         foto.remove()
@@ -106,7 +106,7 @@ class AlbumView(View):
         SpaceParams.name_getter,
         AlbumParams.name,
     )
-    @Auth.require_admin
+    @auth.require_admin
     def post(self, request):
         # Album.creator(request.json())
         Album.create(**request.json())
@@ -114,7 +114,7 @@ class AlbumView(View):
 
     @analyse.query(SpaceParams.name_getter, AlbumParams.name)
     @analyse.json(AlbumParams.name.copy().rename('name'))
-    @Auth.require_admin
+    @auth.require_admin
     def put(self, request):
         album = Album.get_by_name(**request.query())
         album.rename(request.body.name)
@@ -124,7 +124,7 @@ class AlbumView(View):
         SpaceParams.name_getter,
         AlbumParams.name,
     )
-    @Auth.require_admin
+    @auth.require_admin
     def delete(self, request):
         album = Album.get_by_name(**request.query())
         album.remove()
