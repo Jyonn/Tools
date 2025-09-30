@@ -20,4 +20,4 @@ class AlbumParams(metaclass=Params):
 class FotoParams(metaclass=Params):
     model_class = Foto
 
-    id_getter = Validator('foto_id', final_name='foto').to(Foto.get)
+    id_getter = Validator('foto').to(Foto.get)
