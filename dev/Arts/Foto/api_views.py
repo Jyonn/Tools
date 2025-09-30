@@ -104,12 +104,15 @@ class AlbumView(View):
 
     @analyse.json(
         SpaceParams.name_getter,
-        AlbumParams.name.copy().rename('name'),
+        AlbumParams.name,
     )
     @auth.require_admin
     def post(self, request):
         # Album.creator(request.json())
-        Album.create(**request.json())
+        Album.create(
+            name=request.json.album,
+            space=request.json.space,
+        )
         return OK
 
     @analyse.query(SpaceParams.name_getter, AlbumParams.name)
